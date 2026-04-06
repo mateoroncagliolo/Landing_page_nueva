@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-obsidian text-ivory font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+  }
+
+  .font-drama {
+    @apply font-serif italic font-normal tracking-wide;
+  }
+
+  .font-data {
+    @apply font-mono text-sm tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-2xl shadow-xl;
+  }
+  
+  .glass-card-hover {
+    @apply transition-all duration-300 hover:bg-white/[0.04] hover:-translate-y-1 hover:border-champagne/30;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
+  }
+
+  .glow-champagne {
+    box-shadow: 0 0 40px -10px rgba(201, 168, 76, 0.3);
+  }
+}
+
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0D0D12;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2A35;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A84C;
+}

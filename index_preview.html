@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowMint Automations — Tu Gimnasio Responde Solo. Tú Das Clase.</title>
+<meta name="description" content="Automatiza WhatsApp para tu gimnasio. Respuesta inmediata, más clases de prueba, cero bots genéricos.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --mint:#00FF9D;
+  --teal:#64FFDA;
+  --bg:#050B14;
+  --bg2:#070F1C;
+  --surface:#0C1828;
+  --surface2:#0F1F33;
+  --border:rgba(0,255,157,0.15);
+  --text:#E8F4F8;
+  --text-muted:rgba(232,244,248,0.55);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#0C3D2A;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--mint)}
+
+/* Canvas particle layer */
+#particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.35}
+
+/* Layout */
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+section{position:relative;z-index:2}
+
+/* Glass cards */
+.glass{background:rgba(12,24,40,0.7);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px}
+.glass-hover{transition:all .3s ease}
+.glass-hover:hover{background:rgba(15,31,51,0.85);transform:translateY(-4px);border-color:rgba(0,255,157,0.3);box-shadow:0 20px 60px rgba(0,255,157,0.08)}
+
+/* Mint glow */
+.mint-glow{box-shadow:0 0 40px rgba(0,255,157,0.2),0 0 80px rgba(0,255,157,0.05)}
+.text-glow{text-shadow:0 0 30px rgba(0,255,157,0.5)}
+.mint{color:var(--mint)}
+.teal{color:var(--teal)}
+.drama{font-family:'Playfair Display',serif;font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* Radial glow blobs */
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1}
+
+/* NAVBAR */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 24px;opacity:0;transform:translateY(-30px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;background:rgba(5,11,20,0.8);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:16px;padding:12px 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo img{height:36px;width:36px;object-fit:contain}
+.nav-logo-text{font-size:1rem;font-weight:600;color:var(--text);letter-spacing:-0.02em}
+.nav-logo-text span{color:var(--mint)}
+.btn-primary{background:var(--mint);color:#050B14;font-weight:700;font-size:.875rem;padding:10px 22px;border-radius:50px;border:none;cursor:pointer;transition:all .3s;letter-spacing:0.01em;font-family:'Inter',sans-serif}
+.btn-primary:hover{background:var(--teal);box-shadow:0 0 30px rgba(0,255,157,0.4);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--mint);font-weight:600;font-size:.875rem;padding:10px 22px;border-radius:50px;border:1px solid rgba(0,255,157,0.3);cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif}
+.btn-outline:hover{background:rgba(0,255,157,0.06);border-color:var(--mint)}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.25);border-radius:50px;padding:6px 16px;font-size:.75rem;font-family:'JetBrains Mono',monospace;color:var(--mint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}
+.hero-badge span{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:pulse 2s infinite}
+#hero h1{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.08;letter-spacing:-0.03em;margin-bottom:24px}
+#hero h1 em{font-style:normal;color:var(--mint)}
+#hero p{font-size:1.15rem;color:var(--text-muted);max-width:560px;font-weight:300;margin-bottom:40px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:64px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* WHATSAPP MOCKUP */
+.wa-phone{width:100%;max-width:340px;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 40px 80px rgba(0,255,157,0.12),0 0 0 1px rgba(0,255,157,0.15);transform:perspective(1000px) rotateX(8deg) rotateY(-4deg)}
+.wa-header{background:#075E54;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.wa-header-avatar{width:38px;height:38px;border-radius:50%;background:#128C7E;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.9rem;flex-shrink:0}
+.wa-header-info{flex:1}
+.wa-header-name{font-size:.875rem;font-weight:600;color:#fff}
+.wa-header-status{font-size:.7rem;color:rgba(255,255,255,0.7)}
+.wa-body{background:#0D1418;padding:16px 12px;display:flex;flex-direction:column;gap:10px;min-height:280px}
+.wa-body::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M0 0h80v80H0z'/%3E%3C/g%3E%3C/svg%3E")}
+.wa-msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:.8rem;line-height:1.45;position:relative;word-break:break-word}
+.wa-msg.recv{background:#1F2C34;color:#E9ECEC;align-self:flex-start;border-radius:0 12px 12px 12px}
+.wa-msg.sent{background:#005C4B;color:#E9ECEC;align-self:flex-end;border-radius:12px 12px 0 12px}
+.wa-msg-time{font-size:.6rem;color:rgba(255,255,255,0.45);margin-top:4px;display:flex;align-items:center;gap:3px;justify-content:flex-end}
+.wa-ticks{color:#53BDEB}
+.wa-auto-badge{background:rgba(0,255,157,0.12);border:1px solid rgba(0,255,157,0.25);border-radius:6px;padding:4px 10px;font-size:.65rem;font-family:'JetBrains Mono',monospace;color:var(--mint);text-align:center;margin-top:4px;align-self:flex-end}
+.wa-input{background:#1F2C34;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.wa-input-field{flex:1;background:#2A3942;border-radius:20px;padding:8px 14px;font-size:.75rem;color:rgba(255,255,255,0.9);border:none;outline:none;font-family:'Inter',sans-serif}
+.wa-send{width:32px;height:32px;background:#00A884;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* SOCIAL PROOF */
+#social-proof{padding:40px 0;border-top:1px solid rgba(0,255,157,0.06);border-bottom:1px solid rgba(0,255,157,0.06);overflow:hidden;position:relative}
+.marquee-wrap{display:flex;gap:60px;animation:marquee 30s linear infinite;width:max-content}
+.marquee-item{display:flex;align-items:center;gap:10px;opacity:0.35;transition:opacity .3s;white-space:nowrap}
+.marquee-item:hover{opacity:0.8}
+.marquee-dot{width:6px;height:6px;border-radius:50%;border:1px solid rgba(0,255,157,0.5);background:rgba(0,255,157,0.15)}
+.marquee-label{font-weight:700;font-size:.875rem;letter-spacing:.12em;text-transform:uppercase}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.fade-left{position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(to right,var(--bg),transparent);z-index:1}
+.fade-right{position:absolute;right:0;top:0;bottom:0;width:120px;background:linear-gradient(to left,var(--bg),transparent);z-index:1}
+
+/* BENTO */
+#bento{padding:100px 0}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mint);margin-bottom:16px;opacity:.8}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-bottom:16px}
+.section-sub{color:var(--text-muted);font-size:1.05rem;font-weight:300;max-width:500px;margin-bottom:64px;line-height:1.7}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:20px}
+.bcard{padding:32px;position:relative;overflow:hidden;cursor:default}
+.bcard:nth-child(1){grid-column:span 2}
+.bcard:nth-child(2){grid-column:span 1}
+.bcard:nth-child(3){grid-column:1/-1;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:32px}
+.bcard-icon{width:44px;height:44px;border-radius:12px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.bcard-icon svg{width:20px;height:20px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bcard h3{font-size:1.2rem;font-weight:600;margin-bottom:10px;letter-spacing:-0.02em}
+.bcard p{color:var(--text-muted);font-size:.9rem;font-weight:300;line-height:1.6;max-width:320px}
+.bcard-accent{position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,255,157,0.08),transparent 70%);border-radius:50%;pointer-events:none}
+
+/* Response time mini-UI */
+.rt-list{position:absolute;right:28px;top:50%;transform:translateY(-50%);background:rgba(5,11,20,0.9);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:160px;font-family:'JetBrains Mono',monospace;font-size:.7rem}
+.rt-header{display:flex;justify-content:space-between;color:rgba(255,255,255,0.35);margin-bottom:10px;font-size:.65rem;letter-spacing:.06em}
+.rt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:6px;margin-bottom:6px;background:rgba(255,255,255,0.04)}
+.rt-name{color:var(--text)}
+.rt-val{color:var(--mint)}
+.rt-bar{height:2px;width:100%;background:rgba(255,255,255,0.06);border-radius:1px;margin-top:10px;overflow:hidden}
+.rt-bar-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--mint),var(--teal));animation:shimmer 2s linear infinite}
+@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+
+/* Handoff card */
+.handoff{background:rgba(5,11,20,0.9);border:1px solid rgba(0,255,157,0.2);border-radius:12px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:.75rem;max-width:280px}
+.handoff-alert{display:flex;align-items:center;gap:8px;color:var(--mint);margin-bottom:10px;font-size:.7rem;letter-spacing:.06em}
+.red-dot{width:8px;height:8px;border-radius:50%;background:#FF4444;animation:pulse 1.5s infinite;flex-shrink:0}
+.handoff-msg{color:var(--text-muted);margin-bottom:6px;font-size:.73rem}
+.handoff-cmd{color:rgba(255,255,255,0.3);margin-bottom:14px}
+.handoff-btn{width:100%;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.25);border-radius:8px;padding:8px;color:var(--mint);text-align:center;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.handoff-btn:hover{background:rgba(0,255,157,0.15)}
+
+/* MECHANISM */
+#mechanism{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.mech-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px;position:relative}
+.mech-steps::before{content:'';position:absolute;top:48px;left:calc(16.66% + 12px);right:calc(16.66% + 12px);height:1px;background:linear-gradient(90deg,rgba(0,255,157,0.3),rgba(0,255,157,0.6),rgba(0,255,157,0.3));pointer-events:none}
+.mech-step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:32px 24px;position:relative;z-index:2}
+.mech-step-num{width:48px;height:48px;border-radius:50%;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.3);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:var(--mint)}
+.mech-step h3{font-size:1.05rem;font-weight:600;letter-spacing:-0.02em}
+.mech-step p{font-size:.875rem;color:var(--text-muted);font-weight:300;line-height:1.6}
+@media(max-width:768px){.mech-steps{grid-template-columns:1fr}.mech-steps::before{display:none}}
+
+/* WHAT IT DOES */
+#what-it-does{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.wid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
+.wid-item{display:flex;align-items:flex-start;gap:16px;padding:24px;border-radius:14px;background:rgba(12,24,40,0.5);border:1px solid rgba(0,255,157,0.07);transition:all .3s}
+.wid-item:hover{border-color:rgba(0,255,157,0.2);background:rgba(12,24,40,0.8)}
+.wid-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wid-icon svg{width:16px;height:16px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wid-text h4{font-size:.95rem;font-weight:600;margin-bottom:4px;letter-spacing:-0.01em}
+.wid-text p{font-size:.82rem;color:var(--text-muted);font-weight:300;line-height:1.5}
+@media(max-width:768px){.wid-grid{grid-template-columns:1fr}}
+
+/* VSL */
+#vsl{padding:80px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.vsl-wrapper{display:grid;grid-template-columns:1.6fr 1fr;gap:48px;align-items:center}
+.vsl-player{background:rgba(7,15,28,0.9);border:1px solid rgba(0,255,157,0.15);border-radius:20px;overflow:hidden;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 30px 80px rgba(0,0,0,0.4)}
+.vsl-player-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,255,157,0.04),transparent 70%)}
+.vsl-play-btn{width:72px;height:72px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,255,157,0.4);transition:all .3s;z-index:2;position:relative}
+.vsl-play-btn:hover{transform:scale(1.08);box-shadow:0 0 60px rgba(0,255,157,0.5)}
+.vsl-play-btn svg{margin-left:4px}
+.vsl-label{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,255,255,0.35);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.vsl-bullets{display:flex;flex-direction:column;gap:16px}
+.vsl-bullet{display:flex;align-items:flex-start;gap:12px}
+.vsl-bullet-check{width:20px;height:20px;border-radius:50%;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.vsl-bullet-check svg{width:10px;height:10px;stroke:var(--mint);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.vsl-bullet p{font-size:.9rem;color:var(--text-muted);font-weight:300;line-height:1.5}
+.vsl-bullet p strong{color:var(--text);font-weight:500}
+@media(max-width:768px){.vsl-wrapper{grid-template-columns:1fr}}
+
+/* IMPLEMENTATION BAND */
+#impl-band{padding:48px 0;border-top:1px solid rgba(0,255,157,0.06);border-bottom:1px solid rgba(0,255,157,0.06);background:rgba(0,255,157,0.02)}
+.impl-items{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.impl-item{display:flex;align-items:center;gap:10px;font-size:.875rem;color:var(--text-muted)}
+.impl-item svg{width:16px;height:16px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* MECHANISM */
+.mech-nodes{display:flex;align-items:center;justify-content:center;gap:0;margin-top:64px;position:relative}
+.mech-node{display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;z-index:2}
+.mech-circle{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--border);background:var(--surface);position:relative;transition:all .3s}
+.mech-circle.main{width:160px;height:160px;border-color:rgba(0,255,157,0.35);background:rgba(12,24,40,0.9);box-shadow:0 0 40px rgba(0,255,157,0.15),inset 0 0 30px rgba(0,255,157,0.05)}
+.mech-circle.side{width:120px;height:120px}
+.mech-circle svg{stroke:var(--mint);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mech-label{font-size:.8rem;font-weight:500;color:var(--text)}
+.mech-sub{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mint);opacity:.7;text-align:center;max-width:100px}
+.mech-connector{flex:1;max-width:100px;height:2px;background:linear-gradient(90deg,rgba(0,255,157,0.1),rgba(0,255,157,0.4),rgba(0,255,157,0.1));position:relative;overflow:hidden}
+.mech-connector-particle{position:absolute;top:50%;transform:translateY(-50%);width:20px;height:4px;background:var(--mint);border-radius:2px;filter:blur(1px);animation:flow 2s linear infinite}
+@keyframes flow{0%{left:-20px;opacity:0}20%{opacity:1}80%{opacity:1}100%{left:calc(100% + 20px);opacity:0}}
+
+/* OBJECTIONS */
+#objections{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.faq-list{display:flex;flex-direction:column;gap:12px;max-width:760px;margin:0 auto}
+.faq-item{border:1px solid rgba(0,255,157,0.1);border-radius:12px;overflow:hidden;transition:border-color .3s}
+.faq-item.open{border-color:rgba(0,255,157,0.3)}
+.faq-btn{width:100%;background:rgba(12,24,40,0.7);border:none;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;font-size:.95rem;font-weight:500;text-align:left;gap:16px;transition:background .2s}
+.faq-btn:hover{background:rgba(15,31,51,0.9)}
+.faq-icon{width:24px;height:24px;border:1px solid rgba(0,255,157,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--mint);font-size:1rem;transition:transform .3s}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:rgba(0,255,157,0.1)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.faq-answer p{padding:0 24px 20px;color:var(--text-muted);font-size:.9rem;line-height:1.7;font-weight:300}
+.faq-item.open .faq-answer{max-height:300px}
+
+/* CTA */
+#final-cta{padding:100px 24px}
+.cta-card{text-align:center;padding:80px 48px;position:relative;overflow:hidden;border-radius:24px}
+.cta-card h2{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;margin-bottom:20px}
+.cta-card p{color:var(--text-muted);font-size:1.1rem;font-weight:300;max-width:500px;margin:0 auto 40px;line-height:1.7}
+.cta-btn{background:var(--mint);color:#050B14;font-weight:800;font-size:1rem;padding:16px 36px;border-radius:50px;border:none;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;display:inline-block}
+.cta-btn:hover{background:var(--teal);box-shadow:0 0 50px rgba(0,255,157,0.4);transform:translateY(-2px)}
+.cta-note{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-muted);margin-top:18px;letter-spacing:.08em;opacity:.6;text-transform:uppercase}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(0,255,157,0.06);padding:60px 24px 40px;background:rgba(0,0,0,0.3)}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand img{height:40px;width:40px;object-fit:contain;margin-bottom:12px}
+.footer-brand p{color:var(--text-muted);font-size:.875rem;font-weight:300;max-width:260px;line-height:1.6;margin-top:10px}
+footer h4{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--mint);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
+footer ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+footer a{color:var(--text-muted);text-decoration:none;font-size:.875rem;font-weight:300;transition:color .2s}
+footer a:hover{color:var(--mint)}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(0,255,157,0.06);font-size:.75rem;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace}
+.status-dot{display:flex;align-items:center;gap:6px}
+.status-circle{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:pulse 2.5s infinite}
+
+@media(max-width:768px){
+  .bento-grid{grid-template-columns:1fr}
+  .bcard:nth-child(1),.bcard:nth-child(3),.bcard:nth-child(4){grid-column:span 1}
+  .rt-list{display:none}
+  .mech-nodes{flex-direction:column;gap:20px}
+  .mech-connector{width:2px;height:40px;background:linear-gradient(180deg,rgba(0,255,157,0.1),rgba(0,255,157,0.4),rgba(0,255,157,0.1))}
+  .footer-inner{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <img src="Logo fondo transparente.png" alt="FlowMint Logo">
+      <span class="nav-logo-text">Flow<span>Mint</span> <span style="font-weight:400;font-size:.8rem;opacity:.7;letter-spacing:.04em">AUTOMATIONS</span></span>
+    </a>
+    <button class="btn-primary">Auditoría Gratuita →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+    <div>
+      <div class="hero-badge" style="animation:none" id="hero-badge"><span></span>Automatización de WhatsApp para gimnasios</div>
+      <h1 id="hero-h1">Tu gimnasio responde solo.<br><em>Tú das clase.</em></h1>
+      <p id="hero-p">FlowMint responde al instante por WhatsApp con la información real de tu centro, resuelve dudas, guía a los interesados a reservar una clase de prueba y avisa a tu equipo si hace falta una persona. Sin bots genéricos, sin respuestas inventadas.</p>
+      <div class="hero-btns" id="hero-btns">
+        <button class="btn-primary" style="font-size:.95rem;padding:14px 28px">Quiero verlo aplicado a mi gimnasio →</button>
+        <button class="btn-outline" style="font-size:.95rem;padding:14px 28px">Ver cómo funciona</button>
+      </div>
+      <div id="hero-stats" style="display:flex;gap:32px;flex-wrap:wrap">
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">Inmediata</div><div style="font-size:.8rem;color:var(--text-muted)">Respuesta en WhatsApp</div></div>
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">24/7</div><div style="font-size:.8rem;color:var(--text-muted)">Disponibilidad</div></div>
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">0</div><div style="font-size:.8rem;color:var(--text-muted)">Respuestas inventadas</div></div>
+      </div>
+    </div>
+
+    <!-- REAL WHATSAPP MOCKUP -->
+    <div id="hero-visual" style="display:flex;justify-content:center">
+      <div class="wa-phone">
+        <div class="wa-header">
+          <div class="wa-header-avatar">🏋️</div>
+          <div class="wa-header-info">
+            <div class="wa-header-name">CrossFit Élite</div>
+            <div class="wa-header-status">en línea</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+        <div class="wa-body" style="position:relative">
+          <div style="text-align:center;margin:4px 0 8px"><span style="background:rgba(255,255,255,0.06);font-size:.65rem;padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.4)">HOY</span></div>
+          <div class="wa-msg recv">Hola! Vi vuestro anuncio en Instagram. ¿Tenéis clases de prueba de CrossFit?
+            <div class="wa-msg-time">18:43</div>
+          </div>
+          <div class="wa-msg sent">¡Hola! Bienvenido 👋 Sí, tenemos clases de prueba completamente gratuitas. Tenemos hueco hoy a las <strong>19:30h</strong> y mañana a las <strong>7:30h</strong> y <strong>18:00h</strong>. ¿Cuál te va mejor?
+            <div class="wa-msg-time">18:43 <span class="wa-ticks">✓✓</span></div>
+          </div>
+          <div class="wa-auto-badge">⚡ Respondido automáticamente en 1.8s</div>
+          <div class="wa-msg recv">¿Cuánto cuesta la matrícula si me apunto?
+            <div class="wa-msg-time">18:44</div>
+          </div>
+          <div class="wa-msg sent">La matrícula es de 30€ y la cuota mensual de 65€ con acceso ilimitado. Si reservas la prueba esta semana te regalo la matrícula 🎁
+            <div class="wa-msg-time">18:44 <span class="wa-ticks">✓✓</span></div>
+          </div>
+        </div>
+        <div class="wa-input">
+          <div class="wa-input-field" placeholder="Mensaje">Escribe un mensaje…</div>
+          <div class="wa-send">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Hero blobs -->
+  <div class="blob" style="width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,157,0.07),transparent 70%);top:-100px;left:-200px"></div>
+  <div class="blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(100,255,218,0.05),transparent 70%);bottom:0;right:-100px"></div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section id="social-proof">
+  <div class="fade-left"></div>
+  <div class="fade-right"></div>
+  <div class="marquee-wrap" id="marquee">
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Iron Box</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Zenith Pilates</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Combat Academy</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Elevate Fitness</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Core Studio</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Apex Athletics</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Inner Flow</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Iron Box</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Zenith Pilates</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Combat Academy</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Elevate Fitness</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Core Studio</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Apex Athletics</span></div>
+    <div class="marquee-item"><div class="marquee-dot"></div><span class="marquee-label">Inner Flow</span></div>
+  </div>
+</section>
+
+<!-- VSL -->
+<section id="vsl">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="section-label">Demostración</div>
+      <h2 class="section-title">Mira cómo funciona<br><span style="color:var(--mint)">en menos de 2 minutos</span></h2>
+    </div>
+    <div class="vsl-wrapper">
+      <div class="vsl-player" style="cursor:default">
+        <div class="vsl-player-overlay"></div>
+        <video controls style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px" poster="">
+          <source src="VSL.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div>
+        <h3 style="font-size:1.3rem;font-weight:600;letter-spacing:-0.02em;margin-bottom:24px;line-height:1.3">Ve exactamente lo que ocurre desde que el lead escribe hasta que reserva</h3>
+        <div class="vsl-bullets">
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Respuesta automática en WhatsApp</strong> usando solo la información real de tu gimnasio.</p>
+          </div>
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Detecta intención y guía</strong> al interesado a reservar una clase de prueba sin que intervenga nadie.</p>
+          </div>
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Avisa a tu equipo</strong> cuando hay algo que requiere una persona real. Tú siempre tienes el control.</p>
+          </div>
+        </div>
+        <div style="margin-top:32px">
+          <button class="btn-primary" style="font-size:.9rem;padding:13px 26px">Ver si encaja con mi gimnasio →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IT DOES -->
+
+<section id="what-it-does">
+  <div class="container">
+    <div class="section-label">Qué hace exactamente</div>
+    <h2 class="section-title">No es un bot de menús.<br>Es un <span style="color:var(--mint)">asistente que cierra.</span></h2>
+    <p class="section-sub">FlowMint actúa como tu mejor recepcionista, disponible a cualquier hora, entrenado solo con la información de tu centro.</p>
+    <div class="wid-grid">
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="wid-text"><h4>Responde al instante en WhatsApp</h4><p>Cualquier mensaje entra y recibe respuesta en segundos, a cualquier hora del día, sin hacer esperar al interesado.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="wid-text"><h4>Resuelve dudas con la info real de tu centro</h4><p>Precios, horarios, modalidades, ubicación… el sistema solo responde con lo que tú le has dado. Sin inventar nada.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
+        <div class="wid-text"><h4>Guía a reservar una clase de prueba</h4><p>Cuando detecta intención, propone disponibilidad y lleva al interesado a comprometerse con una fecha concreta.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.5 15"/></svg></div>
+        <div class="wid-text"><h4>Hace seguimiento automático</h4><p>Si alguien no confirmó, el sistema puede enviar un recordatorio. Sin que tengas que perseguir a nadie manualmente.</p></div>
+      </div>
+      <div class="wid-item" style="grid-column:span 2">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="wid-text"><h4>Avisa al equipo cuando hace falta una persona real</h4><p>Si la consulta está fuera del guión, el interesado tiene un problema delicado o simplemente pide hablar con alguien, el sistema para, te avisa y tú tomas el relevo. Sin fricciones, sin que el cliente lo note.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO -->
+<section id="bento">
+  <div class="container">
+    <div class="section-label">Propuestas de valor</div>
+    <h2 class="section-title">Tres resultados concretos<br><span style="color:var(--mint)">desde el primer día.</span></h2>
+    <p class="section-sub">Sin cambiar tu operativa. Sin curva de aprendizaje. Sin depender de tu equipo para responder mensajes.</p>
+
+    <div class="bento-grid">
+
+      <!-- Card 1 -->
+      <div class="bcard glass glass-hover">
+        <div class="bcard-accent"></div>
+        <div class="bcard-icon">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3>Cero leads perdidos por tardanza</h3>
+        <p>Cada mensaje recibe respuesta al instante, a cualquier hora. Incluso el sábado por la noche o mientras estás en el tatami.</p>
+        <div class="rt-list">
+          <div class="rt-header"><span>LEAD</span><span>RESPUESTA</span></div>
+          <div class="rt-row"><span class="rt-name">Juan M.</span><span class="rt-val">1.2s</span></div>
+          <div class="rt-row"><span class="rt-name">Sofía T.</span><span class="rt-val">0.8s</span></div>
+          <div class="rt-row"><span class="rt-name">Carlos R.</span><span class="rt-val">1.4s</span></div>
+          <div class="rt-bar"><div class="rt-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bcard glass glass-hover">
+        <div class="bcard-accent"></div>
+        <div class="bcard-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        </div>
+        <h3>Más clases de prueba,<br>menos fricción operativa</h3>
+        <p>El interesado pasa de mensaje a clase reservada sin que intervenga nadie de tu equipo. Tú ves cómo se llena tu agenda.</p>
+      </div>
+
+      <!-- Card 3 – full width -->
+      <div class="bcard glass glass-hover">
+        <div style="flex:1;min-width:0">
+          <div class="bcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Siempre tienes el control</h3>
+          <p>El sistema no improvisa. Solo responde con lo que tú le das. Y cuando algo se sale del guión, te avisa de inmediato para que intervengas tú.</p>
+        </div>
+        <div class="handoff" style="flex-shrink:0;width:300px">
+          <div class="handoff-alert"><div class="red-dot"></div>AVISO: INTERVENCIÓN HUMANA</div>
+          <div class="handoff-msg">El usuario pregunta por una lesión de rodilla.</div>
+          <div class="handoff-cmd">> Pausando respuesta automática…</div>
+          <button class="handoff-btn">Retomar conversación</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MECHANISM -->
+<section id="mechanism">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Cómo funciona</div>
+      <h2 class="section-title">Tres pasos.<br><span style="color:var(--mint)">Todo automatizado.</span></h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">No cambias nada en tu rutina. FlowMint entra en tu WhatsApp actual y empieza a trabajar desde el día uno.</p>
+    </div>
+    <div class="mech-steps">
+      <div class="mech-step glass">
+        <div class="mech-step-num">01</div>
+        <div>
+          <h3>El lead escribe por WhatsApp</h3>
+          <p>Pregunta por horarios, precios o quiere apuntarse. Da igual la hora que sea.</p>
+        </div>
+      </div>
+      <div class="mech-step glass" style="border-color:rgba(0,255,157,0.25);box-shadow:0 0 30px rgba(0,255,157,0.05)">
+        <div class="mech-step-num">02</div>
+        <div>
+          <h3>FlowMint responde, resuelve y detecta intención</h3>
+          <p>Responde con la información real de tu centro, mantiene la conversación y empuja hacia la reserva cuando detecta interés.</p>
+        </div>
+      </div>
+      <div class="mech-step glass">
+        <div class="mech-step-num">03</div>
+        <div>
+          <h3>El lead reserva — o se escala a una persona</h3>
+          <p>Si todo encaja, agenda la clase de prueba. Si hace falta un humano, te avisa al instante y tú tomas el relevo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPLEMENTATION BAND -->
+<section id="impl-band">
+  <div class="container">
+    <div class="impl-items">
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Implementación en menos de una semana
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Onboarding guiado por nuestro equipo
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Sin cambiar tu operativa ni tus herramientas
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Control humano siempre disponible
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIONS -->
+<section id="objections">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="section-label">Preguntas frecuentes</div>
+      <h2 class="section-title">Por qué dudan los gimnasios…<br><span class="drama mint">y por qué FlowMint funciona.</span></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open" data-index="0">
+        <button class="faq-btn">"Ya respondemos nosotros por WhatsApp"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Eso está bien. El problema no es si respondes, sino cuándo. Un lead que escribe a las 9 de la noche y no recibe respuesta hasta el día siguiente ya está frío. FlowMint responde al instante, a cualquier hora, para que no pierdas ese momento de interés.</p></div>
+      </div>
+      <div class="faq-item" data-index="1">
+        <button class="faq-btn">"No quiero que el bot invente o responda mal"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Totalmente entendible. Por eso FlowMint no es un ChatGPT libre: solo sabe lo que tú le enseñas. Si le preguntan algo que no está en su base de conocimiento, para, te avisa y tú continúas. Nunca improvisa ni inventa información sobre tu centro.</p></div>
+      </div>
+      <div class="faq-item" data-index="2">
+        <button class="faq-btn">"Ya tenemos algo parecido con otra empresa"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>La mayoría de soluciones para gimnasios son chatbots con menús fijos del tipo «escribe 1 para horarios, 2 para precios». Eso frustra al usuario y genera abandono. FlowMint mantiene una conversación natural, recuerda el contexto y lleva al interesado a reservar, como haría un buen recepcionista. Si ya tienes algo y no estás del todo satisfecho, vale la pena comparar.</p></div>
+      </div>
+      <div class="faq-item" data-index="3">
+        <button class="faq-btn">"No quiero perder el control de las conversaciones"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>El control siempre es tuyo. Tienes acceso a todas las conversaciones en tiempo real, puedes intervenir cuando quieras y el sistema te avisa automáticamente cuando detecta algo que requiere que hables tú directamente. El sistema trabaja para ti, no al revés.</p></div>
+      </div>
+      <div class="faq-item" data-index="4">
+        <button class="faq-btn">"No sé si esto me va a servir realmente"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Por eso ofrecemos una auditoría gratuita antes de cualquier compromiso. Miramos juntos cómo llegan los leads ahora, cuánto tiempo pierde tu equipo respondiendo y cuántas oportunidades se están escapando. Si no vemos mejora potencial clara, te lo decimos sin rodeos.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="final-cta">
+  <div class="container">
+    <div class="cta-card glass" style="border-color:rgba(0,255,157,0.2)">
+      <div class="blob" style="width:500px;height:500px;background:radial-gradient(circle,rgba(0,255,157,0.08),transparent 70%);top:-150px;right:-150px"></div>
+      <div class="blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(100,255,218,0.06),transparent 70%);bottom:-100px;left:-100px"></div>
+      <div style="position:relative;z-index:2">
+        <h2>Tu gimnasio puede responder<br><span style="color:var(--mint)">sin que tú estés pendiente.</span></h2>
+        <p>Agenda una auditoría gratuita. Analizamos juntos cómo llegan tus leads ahora y te mostramos exactamente qué mejoraría con FlowMint, sin compromiso ni presión.</p>
+        <a href="https://calendly.com/flowmint" target="_blank" rel="noopener">
+          <button class="cta-btn">Reservar Auditoría Gratuita →</button>
+        </a>
+        <div class="cta-note" style="margin-top:20px">Auditoría gratuita · Sin compromiso · Respuesta en menos de 24h</div>
+        <div style="margin-top:12px"><a href="#vsl" style="font-size:.8rem;color:var(--text-muted);text-decoration:none;opacity:.7">→ Ver cómo funciona primero</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="Logo fondo transparente.png" alt="FlowMint" style="height:40px;width:40px;object-fit:contain;margin-bottom:12px">
+      <div style="font-weight:600;font-size:1rem;margin-bottom:8px">FlowMint <span style="color:var(--mint)">Automations</span></div>
+      <p style="color:var(--text-muted);font-size:.875rem;font-weight:300;max-width:260px;line-height:1.6">Automatización de WhatsApp para gimnasios boutique, centros de artes marciales y entrenadores especializados.</p>
+    </div>
+    <div>
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="#">Automatización de WhatsApp</a></li>
+        <li><a href="#">Auditoría Gratuita</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Política de Privacidad</a></li>
+        <li><a href="#">Términos de Servicio</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FlowMint Automations. Todos los derechos reservados.</span>
+    <span style="color:rgba(255,255,255,0.2)">Hecho con intención.</span>
+  </div>
+</footer>
+
+<script>
+// ─── PARTICLE NETWORK ───────────────────────────────────────────────
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [], W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function Particle() {
+  this.x = Math.random() * W;
+  this.y = Math.random() * H;
+  this.vx = (Math.random() - 0.5) * 0.35;
+  this.vy = (Math.random() - 0.5) * 0.35;
+  this.r = Math.random() * 1.8 + 0.4;
+  this.alpha = Math.random() * 0.5 + 0.1;
+}
+
+for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < particles.length; i++) {
+    let a = particles[i];
+    a.x += a.vx; a.y += a.vy;
+    if (a.x < 0 || a.x > W) a.vx *= -1;
+    if (a.y < 0 || a.y > H) a.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,255,157,${a.alpha})`;
+    ctx.fill();
+    for (let j = i + 1; j < particles.length; j++) {
+      let b = particles[j];
+      let dx = a.x - b.x, dy = a.y - b.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        let opacity = (1 - dist / 120) * 0.10;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `rgba(0,255,157,${opacity})`;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ─── GSAP ANIMATIONS ────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.to('#navbar', { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 0.2 });
+
+gsap.fromTo('#hero-badge', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.5 });
+gsap.fromTo('#hero-h1',    { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1,   ease: 'power3.out', delay: 0.7 });
+gsap.fromTo('#hero-p',     { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: 0.9 });
+gsap.fromTo('#hero-btns',  { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 1.1 });
+gsap.fromTo('#hero-stats', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 1.3 });
+gsap.fromTo('#hero-visual',{ rotateX: 18, rotateY: -6, y: 80, opacity: 0, scale: 0.92 },
+                            { rotateX: 8, rotateY: -3, y: 0,  opacity: 1, scale: 1, duration: 1.6, ease: 'power3.out', delay: 0.8 });
+
+ScrollTrigger.create({
+  trigger: '#hero',
+  start: 'top top', end: 'bottom top', scrub: 1,
+  animation: gsap.to('#hero-visual', { rotateX: 0, rotateY: 0 })
+});
+
+gsap.utils.toArray('.bcard').forEach((el, i) => {
+  gsap.fromTo(el, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: i * 0.12,
+    scrollTrigger: { trigger: '#bento', start: 'top 80%' }
+  });
+});
+
+gsap.utils.toArray('.mech-node').forEach((el, i) => {
+  gsap.fromTo(el, { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.7)',
+    scrollTrigger: { trigger: '#mechanism', start: 'top 75%' }, delay: i * 0.25
+  });
+});
+
+gsap.utils.toArray('.faq-item').forEach((el, i) => {
+  gsap.fromTo(el, { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: i * 0.08,
+    scrollTrigger: { trigger: '#objections', start: 'top 80%' }
+  });
+});
+
+gsap.fromTo('#final-cta .cta-card', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: 'power3.out',
+  scrollTrigger: { trigger: '#final-cta', start: 'top 85%' }
+});
+
+// ─── FAQ ACCORDION ───────────────────────────────────────────────────
+document.querySelectorAll('.faq-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>

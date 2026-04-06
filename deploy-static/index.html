@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowMint Automations — Tu Gimnasio Responde Solo. Tú Das Clase.</title>
+<meta name="description" content="Automatiza WhatsApp para tu gimnasio. Respuesta inmediata, más clases de prueba, cero bots genéricos.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --mint:#00FF9D;
+  --teal:#64FFDA;
+  --bg:#050B14;
+  --bg2:#070F1C;
+  --surface:#0C1828;
+  --surface2:#0F1F33;
+  --border:rgba(0,255,157,0.15);
+  --text:#E8F4F8;
+  --text-muted:rgba(232,244,248,0.55);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#0C3D2A;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--mint)}
+
+/* Canvas particle layer */
+#particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.35}
+
+/* Layout */
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+section{position:relative;z-index:2}
+
+/* Glass cards */
+.glass{background:rgba(12,24,40,0.7);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px}
+.glass-hover{transition:all .3s ease}
+.glass-hover:hover{background:rgba(15,31,51,0.85);transform:translateY(-4px);border-color:rgba(0,255,157,0.3);box-shadow:0 20px 60px rgba(0,255,157,0.08)}
+
+/* Mint glow */
+.mint-glow{box-shadow:0 0 40px rgba(0,255,157,0.2),0 0 80px rgba(0,255,157,0.05)}
+.text-glow{text-shadow:0 0 30px rgba(0,255,157,0.5)}
+.mint{color:var(--mint)}
+.teal{color:var(--teal)}
+.drama{font-family:'Playfair Display',serif;font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* Radial glow blobs */
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1}
+
+/* NAVBAR */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 24px;opacity:0;transform:translateY(-30px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;background:rgba(5,11,20,0.8);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:16px;padding:12px 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo img{height:36px;width:36px;object-fit:contain}
+.nav-logo-text{font-size:1rem;font-weight:600;color:var(--text);letter-spacing:-0.02em}
+.nav-logo-text span{color:var(--mint)}
+.btn-primary{background:var(--mint);color:#050B14;font-weight:700;font-size:.875rem;padding:10px 22px;border-radius:50px;border:none;cursor:pointer;transition:all .3s;letter-spacing:0.01em;font-family:'Inter',sans-serif}
+.btn-primary:hover{background:var(--teal);box-shadow:0 0 30px rgba(0,255,157,0.4);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--mint);font-weight:600;font-size:.875rem;padding:10px 22px;border-radius:50px;border:1px solid rgba(0,255,157,0.3);cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif}
+.btn-outline:hover{background:rgba(0,255,157,0.06);border-color:var(--mint)}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.25);border-radius:50px;padding:6px 16px;font-size:.75rem;font-family:'JetBrains Mono',monospace;color:var(--mint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}
+.hero-badge span{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:pulse 2s infinite}
+#hero h1{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.08;letter-spacing:-0.03em;margin-bottom:24px}
+#hero h1 em{font-style:normal;color:var(--mint)}
+#hero p{font-size:1.15rem;color:var(--text-muted);max-width:560px;font-weight:300;margin-bottom:40px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:64px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* WHATSAPP MOCKUP */
+.wa-phone{width:100%;max-width:340px;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 40px 80px rgba(0,255,157,0.12),0 0 0 1px rgba(0,255,157,0.15);transform:perspective(1000px) rotateX(8deg) rotateY(-4deg)}
+.wa-header{background:#075E54;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.wa-header-avatar{width:38px;height:38px;border-radius:50%;background:#128C7E;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.9rem;flex-shrink:0}
+.wa-header-info{flex:1}
+.wa-header-name{font-size:.875rem;font-weight:600;color:#fff}
+.wa-header-status{font-size:.7rem;color:rgba(255,255,255,0.7)}
+.wa-body{background:#0D1418;padding:16px 12px;display:flex;flex-direction:column;gap:10px;min-height:280px}
+.wa-body::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M0 0h80v80H0z'/%3E%3C/g%3E%3C/svg%3E")}
+.wa-msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:.8rem;line-height:1.45;position:relative;word-break:break-word}
+.wa-msg.recv{background:#1F2C34;color:#E9ECEC;align-self:flex-start;border-radius:0 12px 12px 12px}
+.wa-msg.sent{background:#005C4B;color:#E9ECEC;align-self:flex-end;border-radius:12px 12px 0 12px}
+.wa-msg-time{font-size:.6rem;color:rgba(255,255,255,0.45);margin-top:4px;display:flex;align-items:center;gap:3px;justify-content:flex-end}
+.wa-ticks{color:#53BDEB}
+.wa-auto-badge{background:rgba(0,255,157,0.12);border:1px solid rgba(0,255,157,0.25);border-radius:6px;padding:4px 10px;font-size:.65rem;font-family:'JetBrains Mono',monospace;color:var(--mint);text-align:center;margin-top:4px;align-self:flex-end}
+.wa-input{background:#1F2C34;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.wa-input-field{flex:1;background:#2A3942;border-radius:20px;padding:8px 14px;font-size:.75rem;color:rgba(255,255,255,0.9);border:none;outline:none;font-family:'Inter',sans-serif}
+.wa-send{width:32px;height:32px;background:#00A884;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* SOCIAL PROOF */
+#social-proof{padding:40px 0;border-top:1px solid rgba(0,255,157,0.06);border-bottom:1px solid rgba(0,255,157,0.06);overflow:hidden;position:relative}
+.marquee-wrap{display:flex;gap:60px;animation:marquee 30s linear infinite;width:max-content}
+.marquee-item{display:flex;align-items:center;gap:10px;opacity:0.35;transition:opacity .3s;white-space:nowrap}
+.marquee-item:hover{opacity:0.8}
+.marquee-dot{width:6px;height:6px;border-radius:50%;border:1px solid rgba(0,255,157,0.5);background:rgba(0,255,157,0.15)}
+.marquee-label{font-weight:700;font-size:.875rem;letter-spacing:.12em;text-transform:uppercase}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.fade-left{position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(to right,var(--bg),transparent);z-index:1}
+.fade-right{position:absolute;right:0;top:0;bottom:0;width:120px;background:linear-gradient(to left,var(--bg),transparent);z-index:1}
+
+/* BENTO */
+#bento{padding:100px 0}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mint);margin-bottom:16px;opacity:.8}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-bottom:16px}
+.section-sub{color:var(--text-muted);font-size:1.05rem;font-weight:300;max-width:500px;margin-bottom:64px;line-height:1.7}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:20px}
+.bcard{padding:32px;position:relative;overflow:hidden;cursor:default}
+.bcard:nth-child(1){grid-column:span 2}
+.bcard:nth-child(2){grid-column:span 1}
+.bcard:nth-child(3){grid-column:1/-1;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:32px}
+.bcard-icon{width:44px;height:44px;border-radius:12px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.bcard-icon svg{width:20px;height:20px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bcard h3{font-size:1.2rem;font-weight:600;margin-bottom:10px;letter-spacing:-0.02em}
+.bcard p{color:var(--text-muted);font-size:.9rem;font-weight:300;line-height:1.6;max-width:320px}
+.bcard-accent{position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,255,157,0.08),transparent 70%);border-radius:50%;pointer-events:none}
+
+/* Response time mini-UI */
+.rt-list{position:absolute;right:28px;top:50%;transform:translateY(-50%);background:rgba(5,11,20,0.9);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:160px;font-family:'JetBrains Mono',monospace;font-size:.7rem}
+.rt-header{display:flex;justify-content:space-between;color:rgba(255,255,255,0.35);margin-bottom:10px;font-size:.65rem;letter-spacing:.06em}
+.rt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:6px;margin-bottom:6px;background:rgba(255,255,255,0.04)}
+.rt-name{color:var(--text)}
+.rt-val{color:var(--mint)}
+.rt-bar{height:2px;width:100%;background:rgba(255,255,255,0.06);border-radius:1px;margin-top:10px;overflow:hidden}
+.rt-bar-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--mint),var(--teal));animation:shimmer 2s linear infinite}
+@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+
+/* Handoff card */
+.handoff{background:rgba(5,11,20,0.9);border:1px solid rgba(0,255,157,0.2);border-radius:12px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:.75rem;max-width:280px}
+.handoff-alert{display:flex;align-items:center;gap:8px;color:var(--mint);margin-bottom:10px;font-size:.7rem;letter-spacing:.06em}
+.red-dot{width:8px;height:8px;border-radius:50%;background:#FF4444;animation:pulse 1.5s infinite;flex-shrink:0}
+.handoff-msg{color:var(--text-muted);margin-bottom:6px;font-size:.73rem}
+.handoff-cmd{color:rgba(255,255,255,0.3);margin-bottom:14px}
+.handoff-btn{width:100%;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.25);border-radius:8px;padding:8px;color:var(--mint);text-align:center;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.handoff-btn:hover{background:rgba(0,255,157,0.15)}
+
+/* MECHANISM */
+#mechanism{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.mech-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px;position:relative}
+.mech-steps::before{content:'';position:absolute;top:48px;left:calc(16.66% + 12px);right:calc(16.66% + 12px);height:1px;background:linear-gradient(90deg,rgba(0,255,157,0.3),rgba(0,255,157,0.6),rgba(0,255,157,0.3));pointer-events:none}
+.mech-step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:32px 24px;position:relative;z-index:2}
+.mech-step-num{width:48px;height:48px;border-radius:50%;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.3);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:var(--mint)}
+.mech-step h3{font-size:1.05rem;font-weight:600;letter-spacing:-0.02em}
+.mech-step p{font-size:.875rem;color:var(--text-muted);font-weight:300;line-height:1.6}
+@media(max-width:768px){.mech-steps{grid-template-columns:1fr}.mech-steps::before{display:none}}
+
+/* WHAT IT DOES */
+#what-it-does{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.wid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
+.wid-item{display:flex;align-items:flex-start;gap:16px;padding:24px;border-radius:14px;background:rgba(12,24,40,0.5);border:1px solid rgba(0,255,157,0.07);transition:all .3s}
+.wid-item:hover{border-color:rgba(0,255,157,0.2);background:rgba(12,24,40,0.8)}
+.wid-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wid-icon svg{width:16px;height:16px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wid-text h4{font-size:.95rem;font-weight:600;margin-bottom:4px;letter-spacing:-0.01em}
+.wid-text p{font-size:.82rem;color:var(--text-muted);font-weight:300;line-height:1.5}
+@media(max-width:768px){.wid-grid{grid-template-columns:1fr}}
+
+/* VSL */
+#vsl{padding:80px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.vsl-wrapper{display:grid;grid-template-columns:1.6fr 1fr;gap:48px;align-items:center}
+.vsl-player{background:rgba(7,15,28,0.9);border:1px solid rgba(0,255,157,0.15);border-radius:20px;overflow:hidden;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 30px 80px rgba(0,0,0,0.4)}
+.vsl-player-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,255,157,0.04),transparent 70%)}
+.vsl-play-btn{width:72px;height:72px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,255,157,0.4);transition:all .3s;z-index:2;position:relative}
+.vsl-play-btn:hover{transform:scale(1.08);box-shadow:0 0 60px rgba(0,255,157,0.5)}
+.vsl-play-btn svg{margin-left:4px}
+.vsl-label{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,255,255,0.35);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.vsl-bullets{display:flex;flex-direction:column;gap:16px}
+.vsl-bullet{display:flex;align-items:flex-start;gap:12px}
+.vsl-bullet-check{width:20px;height:20px;border-radius:50%;background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.vsl-bullet-check svg{width:10px;height:10px;stroke:var(--mint);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.vsl-bullet p{font-size:.9rem;color:var(--text-muted);font-weight:300;line-height:1.5}
+.vsl-bullet p strong{color:var(--text);font-weight:500}
+@media(max-width:768px){.vsl-wrapper{grid-template-columns:1fr}}
+
+/* IMPLEMENTATION BAND */
+#impl-band{padding:48px 0;border-top:1px solid rgba(0,255,157,0.06);border-bottom:1px solid rgba(0,255,157,0.06);background:rgba(0,255,157,0.02)}
+.impl-items{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.impl-item{display:flex;align-items:center;gap:10px;font-size:.875rem;color:var(--text-muted)}
+.impl-item svg{width:16px;height:16px;stroke:var(--mint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* MECHANISM */
+.mech-nodes{display:flex;align-items:center;justify-content:center;gap:0;margin-top:64px;position:relative}
+.mech-node{display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;z-index:2}
+.mech-circle{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--border);background:var(--surface);position:relative;transition:all .3s}
+.mech-circle.main{width:160px;height:160px;border-color:rgba(0,255,157,0.35);background:rgba(12,24,40,0.9);box-shadow:0 0 40px rgba(0,255,157,0.15),inset 0 0 30px rgba(0,255,157,0.05)}
+.mech-circle.side{width:120px;height:120px}
+.mech-circle svg{stroke:var(--mint);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mech-label{font-size:.8rem;font-weight:500;color:var(--text)}
+.mech-sub{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mint);opacity:.7;text-align:center;max-width:100px}
+.mech-connector{flex:1;max-width:100px;height:2px;background:linear-gradient(90deg,rgba(0,255,157,0.1),rgba(0,255,157,0.4),rgba(0,255,157,0.1));position:relative;overflow:hidden}
+.mech-connector-particle{position:absolute;top:50%;transform:translateY(-50%);width:20px;height:4px;background:var(--mint);border-radius:2px;filter:blur(1px);animation:flow 2s linear infinite}
+@keyframes flow{0%{left:-20px;opacity:0}20%{opacity:1}80%{opacity:1}100%{left:calc(100% + 20px);opacity:0}}
+
+/* OBJECTIONS */
+#objections{padding:100px 0;border-top:1px solid rgba(0,255,157,0.06)}
+.faq-list{display:flex;flex-direction:column;gap:12px;max-width:760px;margin:0 auto}
+.faq-item{border:1px solid rgba(0,255,157,0.1);border-radius:12px;overflow:hidden;transition:border-color .3s}
+.faq-item.open{border-color:rgba(0,255,157,0.3)}
+.faq-btn{width:100%;background:rgba(12,24,40,0.7);border:none;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;font-size:.95rem;font-weight:500;text-align:left;gap:16px;transition:background .2s}
+.faq-btn:hover{background:rgba(15,31,51,0.9)}
+.faq-icon{width:24px;height:24px;border:1px solid rgba(0,255,157,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--mint);font-size:1rem;transition:transform .3s}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:rgba(0,255,157,0.1)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.faq-answer p{padding:0 24px 20px;color:var(--text-muted);font-size:.9rem;line-height:1.7;font-weight:300}
+.faq-item.open .faq-answer{max-height:300px}
+
+/* CTA */
+#final-cta{padding:100px 24px}
+.cta-card{text-align:center;padding:80px 48px;position:relative;overflow:hidden;border-radius:24px}
+.cta-card h2{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;margin-bottom:20px}
+.cta-card p{color:var(--text-muted);font-size:1.1rem;font-weight:300;max-width:500px;margin:0 auto 40px;line-height:1.7}
+.cta-btn{background:var(--mint);color:#050B14;font-weight:800;font-size:1rem;padding:16px 36px;border-radius:50px;border:none;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;display:inline-block}
+.cta-btn:hover{background:var(--teal);box-shadow:0 0 50px rgba(0,255,157,0.4);transform:translateY(-2px)}
+.cta-note{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-muted);margin-top:18px;letter-spacing:.08em;opacity:.6;text-transform:uppercase}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(0,255,157,0.06);padding:60px 24px 40px;background:rgba(0,0,0,0.3)}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand img{height:40px;width:40px;object-fit:contain;margin-bottom:12px}
+.footer-brand p{color:var(--text-muted);font-size:.875rem;font-weight:300;max-width:260px;line-height:1.6;margin-top:10px}
+footer h4{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--mint);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
+footer ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+footer a{color:var(--text-muted);text-decoration:none;font-size:.875rem;font-weight:300;transition:color .2s}
+footer a:hover{color:var(--mint)}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(0,255,157,0.06);font-size:.75rem;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace}
+.status-dot{display:flex;align-items:center;gap:6px}
+.status-circle{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:pulse 2.5s infinite}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE  ·  max-width: 768px
+   Desktop untouched — only small-screen overrides below
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* ── GLOBAL ─────────────────────────────────────────────── */
+  .container{padding:0 20px}
+
+  /* ── NAVBAR ─────────────────────────────────────────────── */
+  #navbar{padding:10px 16px}
+  .nav-inner{padding:10px 18px;border-radius:12px}
+  .nav-logo img{height:28px;width:28px}
+  .nav-logo-text{font-size:.82rem}
+  .btn-primary{font-size:.78rem;padding:8px 16px}
+
+  /* ── HERO ───────────────────────────────────────────────── */
+  #hero{min-height:auto;padding:96px 20px 56px;align-items:flex-start}
+  #hero .container{grid-template-columns:1fr !important;gap:36px !important}
+  #hero h1{font-size:clamp(2rem,8.5vw,2.6rem);letter-spacing:-0.025em}
+  #hero p{font-size:.95rem;max-width:100%;margin-bottom:28px}
+  .hero-badge{font-size:.65rem;padding:5px 14px;margin-bottom:20px}
+  .hero-btns{flex-direction:column;gap:10px;margin-bottom:40px}
+  .hero-btns button{width:100%;text-align:center}
+  #hero-stats{gap:24px;margin-top:8px}
+  #hero-stats > div > div:first-child{font-size:1.3rem}
+  #hero-stats > div > div:last-child{font-size:.75rem}
+  #hero-visual{display:flex;justify-content:center}
+  .wa-phone{max-width:270px;border-radius:18px}
+  .wa-body{min-height:220px;padding:12px 10px;gap:8px}
+  .wa-msg{font-size:.75rem;padding:7px 10px}
+
+  /* ── CREDIBILITY STRIP ──────────────────────────────────── */
+  #impl-band + section,
+  section[style*="padding:28px 0"] .container > div{flex-direction:column;gap:12px;align-items:flex-start;padding:0 4px}
+
+  /* ── VSL ────────────────────────────────────────────────── */
+  #vsl{padding:56px 0}
+  .vsl-wrapper{grid-template-columns:1fr;gap:28px}
+  .vsl-bullets{gap:14px}
+  .vsl-bullet p{font-size:.85rem}
+
+  /* ── WHAT IT DOES ───────────────────────────────────────── */
+  #what-it-does{padding:56px 0}
+  .wid-grid{grid-template-columns:1fr;gap:12px}
+  .wid-item{grid-column:span 1 !important;padding:20px}
+  .wid-icon{width:32px;height:32px;border-radius:8px}
+  .wid-text h4{font-size:.9rem}
+  .wid-text p{font-size:.8rem}
+
+  /* ── BENTO / RESULTS ────────────────────────────────────── */
+  #bento{padding:56px 0}
+  .bento-grid{grid-template-columns:1fr;gap:14px}
+  .bcard:nth-child(1),.bcard:nth-child(2),.bcard:nth-child(3){grid-column:span 1}
+  .bcard:nth-child(3){flex-direction:column !important;gap:20px;align-items:flex-start}
+  .bcard{padding:24px}
+  .bcard h3{font-size:1.05rem}
+  .bcard p{font-size:.85rem;max-width:100%}
+  .bcard-icon{width:36px;height:36px;border-radius:10px;margin-bottom:14px}
+  .rt-list{display:none}
+  .handoff{width:100% !important;max-width:100% !important;font-size:.7rem}
+
+  /* ── MECHANISM ──────────────────────────────────────────── */
+  #mechanism{padding:56px 0}
+  .mech-steps{grid-template-columns:1fr;gap:12px}
+  .mech-steps::before{display:none}
+  .mech-step{padding:24px 20px;text-align:left;align-items:flex-start;gap:12px}
+  .mech-step h3{font-size:1rem}
+  .mech-step p{font-size:.85rem}
+  .mech-step-num{width:40px;height:40px;font-size:.8rem}
+  .mech-nodes{flex-direction:column;gap:20px}
+  .mech-connector{width:2px;height:36px;background:linear-gradient(180deg,rgba(0,255,157,0.1),rgba(0,255,157,0.4),rgba(0,255,157,0.1))}
+
+  /* ── IMPL BAND ──────────────────────────────────────────── */
+  #impl-band{padding:32px 0}
+  .impl-items{flex-direction:column;align-items:flex-start;gap:14px}
+  .impl-item{font-size:.82rem}
+
+  /* ── SECTION TITLES ─────────────────────────────────────── */
+  .section-label{font-size:.65rem}
+  .section-title{font-size:clamp(1.65rem,5.5vw,2.1rem);letter-spacing:-0.025em}
+  .section-sub{font-size:.9rem;margin-bottom:40px}
+
+  /* ── OBJECTIONS / FAQ ───────────────────────────────────── */
+  #objections{padding:56px 0}
+  .faq-list{gap:10px}
+  .faq-btn{font-size:.875rem;padding:16px 20px;line-height:1.4}
+  .faq-answer p{padding:0 20px 16px;font-size:.85rem}
+
+  /* ── FINAL CTA ──────────────────────────────────────────── */
+  #final-cta{padding:56px 20px}
+  .cta-card{padding:48px 24px;border-radius:18px}
+  .cta-card h2{font-size:clamp(1.75rem,6vw,2.2rem);letter-spacing:-0.03em}
+  .cta-card p{font-size:.9rem;margin-bottom:28px}
+  .cta-btn{font-size:.9rem;padding:14px 28px;width:100%}
+  .cta-note{font-size:.65rem}
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  footer{padding:40px 20px 28px}
+  .footer-inner{grid-template-columns:1fr;gap:28px;margin-bottom:28px}
+  .footer-inner > div:nth-child(2),
+  .footer-inner > div:nth-child(3){display:flex;gap:32px}
+  .footer-inner > div:nth-child(2) ul,
+  .footer-inner > div:nth-child(3) ul{gap:6px}
+  footer h4{margin-bottom:10px}
+  .footer-bottom{flex-direction:column;gap:6px;text-align:center;padding-top:20px}
+  .footer-brand p{max-width:100%}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXTRA SMALL  ·  max-width: 480px
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:480px){
+  #navbar{padding:8px 12px}
+  .nav-inner{padding:8px 14px}
+  #hero{padding:88px 16px 48px}
+  #hero h1{font-size:1.9rem}
+  .wa-phone{max-width:240px}
+  .section-title{font-size:1.55rem}
+  .cta-card{padding:36px 20px}
+  .cta-card h2{font-size:1.6rem}
+  .bento-grid,.wid-grid,.mech-steps{gap:10px}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE CONTENT SIMPLIFICATION
+   Less density · More clarity · Desktop fully untouched
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* ── HERO: hide mockup + stats, one CTA, clipped subtitle ── */
+  #hero-visual{display:none !important}
+  #hero-stats{display:none !important}
+  .hero-btns .btn-outline{display:none !important}
+  #hero{padding-bottom:44px}
+  #hero-p{
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+
+  /* ── VSL: compact, clip bullet descriptions ─────────────── */
+  .vsl-wrapper > div:last-child > h3{
+    font-size:.95rem;
+    margin-bottom:12px;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+  .vsl-bullet p{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+
+  /* ── WHAT IT DOES: icon + title only ────────────────────── */
+  .wid-text p{display:none !important}
+  .wid-item{padding:14px 16px}
+
+  /* ── BENTO / RESULTS: title only ────────────────────────── */
+  .bcard > p,.bcard div > p{display:none !important}
+  .handoff-msg,.handoff-cmd{display:none !important}
+  .bcard{padding:20px}
+
+  /* ── MECHANISM: step title only ─────────────────────────── */
+  .mech-step p{display:none !important}
+  .mech-step{padding:18px}
+
+  /* ── IMPL BAND: max 2 items ──────────────────────────────── */
+  .impl-item:nth-child(n+3){display:none !important}
+  .impl-items{gap:10px}
+
+  /* ── OBJECTIONS: clamp open answers ─────────────────────── */
+  .faq-item.open .faq-answer p{
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+
+  /* ── FINAL CTA: headline + button only ──────────────────── */
+  .cta-card > div > p{display:none !important}
+  .cta-note{display:none !important}
+  #final-cta{padding:40px 16px}
+  .cta-card{padding:40px 20px}
+
+  /* ── FOOTER: brand + copyright only ─────────────────────── */
+  .footer-inner > div:not(:first-child){display:none !important}
+  .status-dot{display:none !important}
+  footer{padding:28px 20px 20px}
+  .footer-bottom{padding-top:14px}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE OVERFLOW FIX + VISUAL POLISH
+   Desktop untouched — only mobile refinements
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* ── FIX HORIZONTAL OVERFLOW (blobs & absolute elements) ── */
+  html, body { overflow-x: hidden !important; max-width: 100% }
+  section, header, nav, footer { overflow-x: hidden }
+  .blob { max-width: 80vw !important }
+
+  /* ── HERO: centered, minimal, premium ─────────────────────── */
+  #hero {
+    align-items: center;
+    text-align: center;
+    padding: 100px 24px 52px;
+  }
+  #hero .container {
+    justify-items: center;
+    max-width: 100%;
+  }
+  #hero .container > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-badge { align-self: center }
+  #hero h1 { max-width: 100%; line-height: 1.1 }
+  #hero-p { text-align: center }
+  .hero-btns { justify-content: center; width: 100% }
+  .hero-btns button { width: 100%; justify-content: center }
+
+  /* ── CREDIBILITY STRIP: centered on mobile ────────────────── */
+  section[style*="padding:28px 0"] .container > div {
+    justify-content: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  /* ── VSL: tighter, focused ─────────────────────────────────── */
+  #vsl { padding: 52px 0 }
+  #vsl .container { padding: 0 20px }
+  .vsl-wrapper { gap: 24px }
+
+  /* ── WHAT IT DOES: compact cards ──────────────────────────── */
+  .wid-item { border-radius: 12px; gap: 12px }
+  .wid-text h4 { line-height: 1.3 }
+
+  /* ── BENTO: cleaner ────────────────────────────────────────── */
+  .bcard { border-radius: 14px }
+  .bcard h3 { line-height: 1.3 }
+  .bcard-accent { display: none }
+
+  /* ── MECHANISM: pill numbers stand out ─────────────────────── */
+  .mech-step { border-radius: 14px; flex-direction: row; align-items: center; gap: 14px; text-align: left }
+  .mech-step-num { flex-shrink: 0 }
+
+  /* ── OBJECTIONS: breathing ─────────────────────────────────── */
+  .faq-item { border-radius: 12px }
+  .faq-btn { gap: 12px }
+
+  /* ── FINAL CTA ─────────────────────────────────────────────── */
+  .cta-card h2 { line-height: 1.15 }
+  .cta-btn { display: block; width: 100%; text-align: center }
+
+  /* ── FOOTER: minimal, centered ─────────────────────────────── */
+  .footer-brand p { font-size: .8rem }
+  .footer-bottom { font-size: .7rem }
+}
+
+/* ── FIX 1: FAQ spacing when open on mobile ─────────────────────── */
+@media(max-width:768px){
+  .faq-answer p {
+    padding: 14px 20px 20px !important;
+    line-height: 1.75 !important;
+  }
+  .faq-item.open .faq-answer {
+    max-height: 420px !important;
+  }
+  .faq-item.open .faq-answer p {
+    -webkit-line-clamp: 6 !important;
+    line-clamp: 6 !important;
+  }
+}
+
+/* ── FIX 2: Hero phone mockup side-by-side (screens ≥ 400px) ─────── */
+@media(min-width:400px) and (max-width:768px){
+  /* restore visual, undo centering */
+  #hero-visual { display: flex !important; justify-content: flex-end; align-items: center }
+  #hero { text-align: left }
+  #hero .container { grid-template-columns: 1.3fr 1fr !important; gap: 16px !important }
+  #hero .container > div:first-child { align-items: flex-start }
+  #hero-p { text-align: left }
+  .hero-btns { justify-content: flex-start }
+  .hero-btns button { width: auto !important; font-size: .82rem !important; padding: 12px 18px !important }
+
+  /* compact WhatsApp phone */
+  .wa-phone { max-width: 140px !important; border-radius: 14px }
+  .wa-header { padding: 7px 9px !important }
+  .wa-header-avatar { width: 24px !important; height: 24px !important; font-size: .68rem !important }
+  .wa-header-name { font-size: .68rem !important }
+  .wa-header-status { font-size: .56rem !important }
+  .wa-body { min-height: 175px !important; padding: 7px 6px !important; gap: 6px !important }
+  .wa-msg { font-size: .58rem !important; padding: 5px 7px !important; max-width: 92% !important; border-radius: 9px !important }
+  .wa-auto-badge { font-size: .5rem !important; padding: 3px 6px !important }
+  .wa-input { padding: 5px 7px !important }
+  .wa-input-field { font-size: .58rem !important; padding: 4px 7px !important }
+  .wa-send { width: 24px !important; height: 24px !important }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <img src="Logo fondo transparente.png" alt="FlowMint Logo">
+      <span class="nav-logo-text">Flow<span>Mint</span><span class="nav-sub"> AUTOMATIONS</span></span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#vsl" onclick="navScrollTo('vsl');return false;">Demo</a>
+      <a class="nav-link" href="#what-it-does" onclick="navScrollTo('what-it-does');return false;">Sistema</a>
+      <a class="nav-link" href="#objections" onclick="navScrollTo('objections');return false;">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-primary nav-cta" onclick="openCalendly()">Auditoría Gratuita</button>
+      <button class="nav-burger" id="nav-burger" onclick="toggleNavMenu()" aria-label="Menú">
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="18" y2="1"/><line x1="0" y1="7" x2="18" y2="7"/><line x1="0" y1="13" x2="18" y2="13"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="nav-drawer">
+    <a class="nav-drawer-link" href="#vsl" onclick="navCloseTo('vsl');return false;">Demo en vídeo</a>
+    <a class="nav-drawer-link" href="#what-it-does" onclick="navCloseTo('what-it-does');return false;">Qué hace exactamente</a>
+    <a class="nav-drawer-link" href="#bento" onclick="navCloseTo('bento');return false;">Resultados</a>
+    <a class="nav-drawer-link" href="#mechanism" onclick="navCloseTo('mechanism');return false;">Cómo funciona</a>
+    <a class="nav-drawer-link" href="#objections" onclick="navCloseTo('objections');return false;">Preguntas frecuentes</a>
+    <a class="nav-drawer-link nav-drawer-cta" href="#final-cta" onclick="navCloseTo('final-cta');return false;">Reservar Auditoría Gratuita →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+    <div>
+      <div class="hero-badge" style="animation:none" id="hero-badge"><span></span>Automatización de WhatsApp para gimnasios</div>
+      <h1 id="hero-h1">Tu gimnasio responde solo.<br><em>Tú das clase.</em></h1>
+      <p id="hero-p"><span class="d-only">FlowMint responde al instante por WhatsApp con la información real de tu centro, resuelve dudas, guía a los interesados a reservar una clase de prueba y avisa a tu equipo cuando hace falta una persona.</span><span class="m-only">Responde en segundos. Resuelve dudas. Lleva al lead a reservar — solo.</span></p>
+      <div class="hero-btns" id="hero-btns">
+        <button class="btn-primary" style="font-size:.95rem;padding:14px 28px" onclick="document.getElementById('vsl').scrollIntoView({behavior:'smooth'})">Quiero verlo aplicado a mi gimnasio →</button>
+        <button class="btn-outline" style="font-size:.95rem;padding:14px 28px" onclick="openCalendly()">Auditoría Gratuita</button>
+      </div>
+      <div id="hero-stats" style="display:flex;gap:32px;flex-wrap:wrap">
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">Inmediata</div><div style="font-size:.8rem;color:var(--text-muted)">Respuesta en WhatsApp</div></div>
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">24/7</div><div style="font-size:.8rem;color:var(--text-muted)">Disponibilidad</div></div>
+        <div><div style="font-size:1.6rem;font-weight:800;color:var(--mint)" class="text-glow">0</div><div style="font-size:.8rem;color:var(--text-muted)">Respuestas inventadas</div></div>
+      </div>
+    </div>
+
+    <!-- REAL WHATSAPP MOCKUP -->
+    <div id="hero-visual" style="display:flex;justify-content:center">
+      <div class="wa-phone">
+        <div class="wa-header">
+          <div class="wa-header-avatar">🏋️</div>
+          <div class="wa-header-info">
+            <div class="wa-header-name">CrossFit Élite</div>
+            <div class="wa-header-status">en línea</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+        <div class="wa-body" style="position:relative">
+          <div style="text-align:center;margin:4px 0 8px"><span style="background:rgba(255,255,255,0.06);font-size:.65rem;padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.4)">HOY</span></div>
+          <div class="wa-msg recv">Hola! Vi vuestro anuncio en Instagram. ¿Tenéis clases de prueba de CrossFit?
+            <div class="wa-msg-time">18:43</div>
+          </div>
+          <div class="wa-msg sent">¡Hola! Bienvenido 👋 Sí, tenemos clases de prueba completamente gratuitas. Tenemos hueco hoy a las <strong>19:30h</strong> y mañana a las <strong>7:30h</strong> y <strong>18:00h</strong>. ¿Cuál te va mejor?
+            <div class="wa-msg-time">18:43 <span class="wa-ticks">✓✓</span></div>
+          </div>
+          <div class="wa-auto-badge">⚡ Respondido automáticamente en 1.8s</div>
+          <div class="wa-msg recv">¿Cuánto cuesta la matrícula si me apunto?
+            <div class="wa-msg-time">18:44</div>
+          </div>
+          <div class="wa-msg sent">La matrícula es de 30€ y la cuota mensual de 65€ con acceso ilimitado. Si reservas la prueba esta semana te regalo la matrícula 🎁
+            <div class="wa-msg-time">18:44 <span class="wa-ticks">✓✓</span></div>
+          </div>
+        </div>
+        <div class="wa-input">
+          <div class="wa-input-field" placeholder="Mensaje">Escribe un mensaje…</div>
+          <div class="wa-send">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Hero blobs -->
+  <div class="blob" style="width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,157,0.07),transparent 70%);top:-100px;left:-200px"></div>
+  <div class="blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(100,255,218,0.05),transparent 70%);bottom:0;right:-100px"></div>
+</section>
+
+<!-- CREDIBILITY STRIP -->
+<section style="padding:28px 0;border-top:1px solid rgba(0,255,157,0.06);border-bottom:1px solid rgba(0,255,157,0.06);background:rgba(0,255,157,0.02)">
+  <div class="container">
+    <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(232,244,248,0.5);font-family:'JetBrains Mono',monospace;letter-spacing:.04em"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00FF9D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Implementación en 7 días</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(232,244,248,0.5);font-family:'JetBrains Mono',monospace;letter-spacing:.04em"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00FF9D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Sin cambiar tu operativa</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(232,244,248,0.5);font-family:'JetBrains Mono',monospace;letter-spacing:.04em"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00FF9D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Control humano siempre disponible</div>
+    </div>
+  </div>
+</section>
+
+<!-- VSL -->
+<section id="vsl">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="section-label">Demostración</div>
+      <h2 class="section-title">Mira cómo funciona<br><span style="color:var(--mint)">en menos de 2 minutos</span></h2>
+    </div>
+    <div class="vsl-wrapper">
+      <div class="vsl-player" id="vsl-player" onclick="playVSL()" style="cursor:pointer">
+        <div class="vsl-player-overlay"></div>
+        <div id="vsl-thumb" style="position:absolute;inset:0;z-index:3;border-radius:20px;overflow:hidden">
+          <img src="VSL cover.png" alt="Ver demostración de FlowMint" style="width:100%;height:100%;object-fit:cover">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.25)"></div>
+          <div class="vsl-play-btn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#050B14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <video id="vsl-video" controls style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px;display:none" poster="VSL cover.png">
+          <source src="VSL.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div>
+        <h3 style="font-size:1.3rem;font-weight:600;letter-spacing:-0.02em;margin-bottom:24px;line-height:1.3">Ve exactamente lo que ocurre desde que el lead escribe hasta que reserva</h3>
+        <div class="vsl-bullets">
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Respuesta automática en WhatsApp</strong> usando solo la información real de tu gimnasio.</p>
+          </div>
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Detecta intención y guía</strong> al interesado a reservar una clase de prueba sin que intervenga nadie.</p>
+          </div>
+          <div class="vsl-bullet">
+            <div class="vsl-bullet-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <p><strong>Avisa a tu equipo</strong> cuando hay algo que requiere una persona real. Tú siempre tienes el control.</p>
+          </div>
+        </div>
+        <div style="margin-top:32px">
+          <button class="btn-primary" style="font-size:.9rem;padding:13px 26px" onclick="openCalendly()">Reservar Auditoría Gratuita →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IT DOES -->
+
+<section id="what-it-does">
+  <div class="container">
+    <div class="section-label">Qué hace exactamente</div>
+    <h2 class="section-title">No es un bot de menús.<br>Es un <span style="color:var(--mint)">asistente que convierte conversaciones en reservas.</span></h2>
+    <p class="section-sub">FlowMint actúa como tu mejor recepcionista, disponible a cualquier hora, entrenado solo con la información de tu centro.</p>
+    <div class="wid-grid">
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="wid-text"><h4>Responde al instante en WhatsApp</h4><p>Cualquier mensaje entra y recibe respuesta en segundos, a cualquier hora del día, sin hacer esperar al interesado.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="wid-text"><h4>Resuelve dudas con la info real de tu centro</h4><p>Precios, horarios, modalidades, ubicación… el sistema solo responde con lo que tú le has dado. Sin inventar nada.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
+        <div class="wid-text"><h4>Guía a reservar una clase de prueba</h4><p>Cuando detecta intención, propone disponibilidad y lleva al interesado a comprometerse con una fecha concreta.</p></div>
+      </div>
+      <div class="wid-item">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.5 15"/></svg></div>
+        <div class="wid-text"><h4>Hace seguimiento automático</h4><p>Si alguien no confirmó, el sistema puede enviar un recordatorio. Sin que tengas que perseguir a nadie manualmente.</p></div>
+      </div>
+      <div class="wid-item" style="grid-column:span 2">
+        <div class="wid-icon"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="wid-text"><h4>Avisa al equipo cuando hace falta una persona real</h4><p>Si la consulta está fuera del guión, el interesado tiene un problema delicado o simplemente pide hablar con alguien, el sistema para, te avisa y tú tomas el relevo. Sin fricciones, sin que el cliente lo note.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO -->
+<section id="bento">
+  <div class="container">
+    <div class="section-label">Propuestas de valor</div>
+    <h2 class="section-title">Tres resultados concretos<br><span style="color:var(--mint)">desde el primer día.</span></h2>
+    <p class="section-sub">Sin cambiar tu operativa. Sin curva de aprendizaje. Sin depender de tu equipo para responder mensajes.</p>
+
+    <div class="bento-grid">
+
+      <!-- Card 1 -->
+      <div class="bcard glass glass-hover">
+        <div class="bcard-accent"></div>
+        <div class="bcard-icon">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3>Cero leads perdidos por tardanza</h3>
+        <p>Cada mensaje recibe respuesta al instante, a cualquier hora. Incluso el sábado por la noche o mientras estás en el tatami.</p>
+        <div class="rt-list">
+          <div class="rt-header"><span>LEAD</span><span>RESPUESTA</span></div>
+          <div class="rt-row"><span class="rt-name">Juan M.</span><span class="rt-val">1.2s</span></div>
+          <div class="rt-row"><span class="rt-name">Sofía T.</span><span class="rt-val">0.8s</span></div>
+          <div class="rt-row"><span class="rt-name">Carlos R.</span><span class="rt-val">1.4s</span></div>
+          <div class="rt-bar"><div class="rt-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bcard glass glass-hover">
+        <div class="bcard-accent"></div>
+        <div class="bcard-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        </div>
+        <h3>Más clases de prueba,<br>menos fricción operativa</h3>
+        <p>El interesado pasa de mensaje a clase reservada sin que intervenga nadie de tu equipo. Tú ves cómo se llena tu agenda.</p>
+      </div>
+
+      <!-- Card 3 – full width -->
+      <div class="bcard glass glass-hover">
+        <div style="flex:1;min-width:0">
+          <div class="bcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Siempre tienes el control</h3>
+          <p>El sistema no improvisa. Solo responde con lo que tú le das. Y cuando algo se sale del guión, te avisa de inmediato para que intervengas tú.</p>
+        </div>
+        <div class="handoff" style="flex-shrink:0;width:300px">
+          <div class="handoff-alert"><div class="red-dot"></div>AVISO: INTERVENCIÓN HUMANA</div>
+          <div class="handoff-msg">El usuario pregunta por una lesión de rodilla.</div>
+          <div class="handoff-cmd">> Pausando respuesta automática…</div>
+          <button class="handoff-btn">Retomar conversación</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MECHANISM -->
+<section id="mechanism">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Cómo funciona</div>
+      <h2 class="section-title">Tres pasos.<br><span style="color:var(--mint)">Todo automatizado.</span></h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">No cambias nada en tu rutina. FlowMint entra en tu WhatsApp actual y empieza a trabajar desde el día uno.</p>
+    </div>
+    <div class="mech-steps">
+      <div class="mech-step glass">
+        <div class="mech-step-num">01</div>
+        <div>
+          <h3>El lead escribe por WhatsApp</h3>
+          <p>Pregunta por horarios, precios o quiere apuntarse. Da igual la hora que sea.</p>
+        </div>
+      </div>
+      <div class="mech-step glass" style="border-color:rgba(0,255,157,0.25);box-shadow:0 0 30px rgba(0,255,157,0.05)">
+        <div class="mech-step-num">02</div>
+        <div>
+          <h3>FlowMint responde, resuelve y detecta intención</h3>
+          <p>Responde con la información real de tu centro, mantiene la conversación y empuja hacia la reserva cuando detecta interés.</p>
+        </div>
+      </div>
+      <div class="mech-step glass">
+        <div class="mech-step-num">03</div>
+        <div>
+          <h3>El lead reserva — o se escala a una persona</h3>
+          <p>Si todo encaja, agenda la clase de prueba. Si hace falta un humano, te avisa al instante y tú tomas el relevo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPLEMENTATION BAND -->
+<section id="impl-band">
+  <div class="container">
+    <div class="impl-items">
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Implementación en menos de una semana
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Onboarding guiado por nuestro equipo
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Sin cambiar tu operativa ni tus herramientas
+      </div>
+      <div class="impl-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Control humano siempre disponible
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIONS -->
+<section id="objections">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="section-label">Preguntas frecuentes</div>
+      <h2 class="section-title">Por qué dudan los gimnasios…<br><span class="drama mint">y por qué FlowMint funciona.</span></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open" data-index="0">
+        <button class="faq-btn">"Ya respondemos nosotros por WhatsApp"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Eso está bien. El problema no es si respondes, sino cuándo. Un lead que escribe a las 9 de la noche y no recibe respuesta hasta el día siguiente ya está frío. FlowMint responde al instante, a cualquier hora, para que no pierdas ese momento de interés.</p></div>
+      </div>
+      <div class="faq-item" data-index="1">
+        <button class="faq-btn">"No quiero que el bot invente o responda mal"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Totalmente entendible. Por eso FlowMint no es un ChatGPT libre: solo sabe lo que tú le enseñas. Si le preguntan algo que no está en su base de conocimiento, para, te avisa y tú continúas. Nunca improvisa ni inventa información sobre tu centro.</p></div>
+      </div>
+      <div class="faq-item" data-index="2">
+        <button class="faq-btn">"Ya tenemos algo parecido con otra empresa"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Perfecto. La pregunta es si lo que tienes convierte leads en reservas o solo responde mensajes básicos. La mayoría de alternativas son menús de opciones que frustran al usuario. FlowMint mantiene una conversación real, detecta intención y guía hacia la reserva. Si lo que tienes funciona bien, no cambies nada. Si quieres comparar, lo vemos juntos en la auditoría.</p></div>
+      </div>
+      <div class="faq-item" data-index="3">
+        <button class="faq-btn">"No quiero perder el control de las conversaciones"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>El control siempre es tuyo. Tienes acceso a todas las conversaciones en tiempo real, puedes intervenir cuando quieras y el sistema te avisa automáticamente cuando detecta algo que requiere que hables tú directamente. El sistema trabaja para ti, no al revés.</p></div>
+      </div>
+      <div class="faq-item" data-index="4">
+        <button class="faq-btn">"No sé si esto me va a servir realmente"<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><p>Es una duda razonable. Por eso la primera conversación es gratuita: miramos juntos cómo llegan tus leads ahora, cuánto tiempo pierde tu equipo respondiendo y cuántas oportunidades se van sin contestar. Si no vemos un caso claro de mejora, te lo decimos sin venderti nada.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="final-cta">
+  <div class="container">
+    <div class="cta-card glass" style="border-color:rgba(0,255,157,0.2)">
+      <div class="blob" style="width:500px;height:500px;background:radial-gradient(circle,rgba(0,255,157,0.08),transparent 70%);top:-150px;right:-150px"></div>
+      <div class="blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(100,255,218,0.06),transparent 70%);bottom:-100px;left:-100px"></div>
+      <div style="position:relative;z-index:2">
+        <h2>Haz que tu WhatsApp responda<br><span style="color:var(--mint)">aunque tú estés dando clase.</span></h2>
+        <p>Agenda una auditoría gratuita. Analizamos juntos cómo llegan tus leads ahora y te mostramos exactamente qué mejoraría con FlowMint, sin compromiso ni presión.</p>
+        <button class="cta-btn" onclick="openCalendly()">Reservar Auditoría Gratuita →</button>
+        <div class="cta-note" style="margin-top:20px">Auditoría gratuita · Sin compromiso · Respuesta en menos de 24h</div>
+        <div style="margin-top:12px"><a href="#vsl" style="font-size:.8rem;color:var(--text-muted);text-decoration:none;opacity:.7" onclick="document.getElementById('vsl').scrollIntoView({behavior:'smooth'});return false;">→ Ver cómo funciona primero</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="Logo fondo transparente.png" alt="FlowMint" style="height:40px;width:40px;object-fit:contain;margin-bottom:12px">
+      <div style="font-weight:600;font-size:1rem;margin-bottom:8px">FlowMint <span style="color:var(--mint)">Automations</span></div>
+      <p style="color:var(--text-muted);font-size:.875rem;font-weight:300;max-width:260px;line-height:1.6">Automatización de WhatsApp para gimnasios boutique, centros de artes marciales y entrenadores especializados.</p>
+    </div>
+    <div>
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="#">Automatización de WhatsApp</a></li>
+        <li><a href="#">Auditoría Gratuita</a></li>
+        <li><a href="https://wa.me/34613855535" target="_blank" rel="noopener">Contacto por WhatsApp</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Política de Privacidad</a></li>
+        <li><a href="#">Términos de Servicio</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FlowMint Automations. Todos los derechos reservados.</span>
+    <span style="color:rgba(255,255,255,0.2)">Hecho con intención.</span>
+  </div>
+</footer>
+
+<script>
+// ─── PARTICLE NETWORK ───────────────────────────────────────────────
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [], W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function Particle() {
+  this.x = Math.random() * W;
+  this.y = Math.random() * H;
+  this.vx = (Math.random() - 0.5) * 0.35;
+  this.vy = (Math.random() - 0.5) * 0.35;
+  this.r = Math.random() * 1.8 + 0.4;
+  this.alpha = Math.random() * 0.5 + 0.1;
+}
+
+for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < particles.length; i++) {
+    let a = particles[i];
+    a.x += a.vx; a.y += a.vy;
+    if (a.x < 0 || a.x > W) a.vx *= -1;
+    if (a.y < 0 || a.y > H) a.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,255,157,${a.alpha})`;
+    ctx.fill();
+    for (let j = i + 1; j < particles.length; j++) {
+      let b = particles[j];
+      let dx = a.x - b.x, dy = a.y - b.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        let opacity = (1 - dist / 120) * 0.10;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `rgba(0,255,157,${opacity})`;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ─── GSAP ANIMATIONS ────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.to('#navbar', { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 0.2 });
+
+gsap.fromTo('#hero-badge', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.5 });
+gsap.fromTo('#hero-h1',    { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1,   ease: 'power3.out', delay: 0.7 });
+gsap.fromTo('#hero-p',     { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: 0.9 });
+gsap.fromTo('#hero-btns',  { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 1.1 });
+gsap.fromTo('#hero-stats', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 1.3 });
+gsap.fromTo('#hero-visual',{ rotateX: 18, rotateY: -6, y: 80, opacity: 0, scale: 0.92 },
+                            { rotateX: 8, rotateY: -3, y: 0,  opacity: 1, scale: 1, duration: 1.6, ease: 'power3.out', delay: 0.8 });
+
+ScrollTrigger.create({
+  trigger: '#hero',
+  start: 'top top', end: 'bottom top', scrub: 1,
+  animation: gsap.to('#hero-visual', { rotateX: 0, rotateY: 0 })
+});
+
+gsap.utils.toArray('.bcard').forEach((el, i) => {
+  gsap.fromTo(el, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: i * 0.12,
+    scrollTrigger: { trigger: '#bento', start: 'top 80%' }
+  });
+});
+
+gsap.utils.toArray('.mech-node').forEach((el, i) => {
+  gsap.fromTo(el, { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.7)',
+    scrollTrigger: { trigger: '#mechanism', start: 'top 75%' }, delay: i * 0.25
+  });
+});
+
+gsap.utils.toArray('.faq-item').forEach((el, i) => {
+  gsap.fromTo(el, { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: i * 0.08,
+    scrollTrigger: { trigger: '#objections', start: 'top 80%' }
+  });
+});
+
+gsap.fromTo('#final-cta .cta-card', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: 'power3.out',
+  scrollTrigger: { trigger: '#final-cta', start: 'top 85%' }
+});
+
+// ─── FAQ ACCORDION ───────────────────────────────────────────────────
+document.querySelectorAll('.faq-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// ─── VSL PLAYER ──────────────────────────────────────────────────────
+function playVSL() {
+  document.getElementById('vsl-thumb').style.display = 'none';
+  const v = document.getElementById('vsl-video');
+  v.style.display = 'block';
+  const p = document.getElementById('vsl-player');
+  p.onclick = null;
+  p.style.cursor = 'default';
+  v.play();
+}
+
+// ─── CALENDLY ────────────────────────────────────────────────────────
+function openCalendly() {
+  Calendly.initPopupWidget({url: 'https://calendly.com/mateo-flowmintautomations/consultoria-gratuita'});
+  return false;
+}
+function toggleNavMenu(){
+  document.getElementById('nav-drawer').classList.toggle('is-open');
+  document.getElementById('nav-burger').classList.toggle('is-open');
+}
+function navCloseTo(id){
+  document.getElementById('nav-drawer').classList.remove('is-open');
+  document.getElementById('nav-burger').classList.remove('is-open');
+  setTimeout(()=>document.getElementById(id).scrollIntoView({behavior:'smooth'}),120);
+}
+function navScrollTo(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav-drawer').classList.remove('is-open');
+  document.getElementById('nav-burger').classList.remove('is-open');
+},{passive:true});
+</script>
+<!-- NAV + FAQ CSS --><style>
+/* ── NAV: DESKTOP LINKS ───────────────────────────── */
+.nav-sub{font-weight:400;font-size:.8rem;opacity:.7;letter-spacing:.04em}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{color:rgba(232,244,248,.55);text-decoration:none;font-size:.83rem;font-weight:400;letter-spacing:.005em;transition:color .2s;white-space:nowrap}
+.nav-link:hover{color:var(--mint)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+
+/* ── HAMBURGER: hidden on desktop ─────────────────── */
+.nav-burger{display:none;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 10px;color:var(--text);cursor:pointer;transition:all .2s;line-height:0;align-items:center;justify-content:center}
+.nav-burger:hover,.nav-burger.is-open{background:rgba(0,255,157,.08);border-color:rgba(0,255,157,.3)}
+
+/* ── DRAWER: hidden on desktop ────────────────────── */
+.nav-drawer{display:none}
+
+/* ── MOBILE OVERRIDES ─────────────────────────────── */
+@media(max-width:768px){
+  /* Overflow fix so drawer can extend below navbar */
+  #navbar{overflow:visible !important}
+
+  /* Hide desktop links, show hamburger */
+  .nav-links{display:none !important}
+  .nav-burger{display:flex !important}
+
+  /* Premium logo on mobile */
+  .nav-logo-text{font-size:.98rem !important;font-weight:700 !important;letter-spacing:-.025em !important}
+  .nav-sub{display:none !important}
+
+  /* Cleaner CTA button on mobile */
+  .nav-cta{font-size:.82rem !important;padding:9px 17px !important;letter-spacing:.01em !important;font-weight:700 !important}
+
+  /* Drawer: glass panel below navbar */
+  .nav-drawer{
+    display:block;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:16px;right:16px;
+    background:rgba(5,11,20,.97);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    border:1px solid rgba(0,255,157,.13);
+    border-radius:14px;
+    overflow:hidden;
+    z-index:999;
+    max-height:0;
+    opacity:0;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .25s;
+    pointer-events:none;
+  }
+  .nav-drawer.is-open{max-height:480px;opacity:1;pointer-events:auto}
+  .nav-drawer-link{
+    display:block;
+    padding:15px 20px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    color:rgba(232,244,248,.85);
+    text-decoration:none;
+    font-size:.93rem;font-weight:400;letter-spacing:-.01em;
+    transition:color .2s,background .15s;
+  }
+  .nav-drawer-link:hover{color:var(--mint);background:rgba(0,255,157,.04)}
+  .nav-drawer-link:last-child{border-bottom:none}
+  .nav-drawer-cta{color:var(--mint) !important;font-weight:600;padding-bottom:18px}
+
+  /* FAQ: more breathing room */
+  #objections{padding:72px 20px 80px !important}
+  .faq-list{gap:12px !important}
+  .faq-item{transition:box-shadow .3s,border-color .3s}
+  .faq-item.open{
+    box-shadow:0 8px 28px rgba(0,0,0,.25),0 0 0 1px rgba(0,255,157,.12) !important;
+    border-color:rgba(0,255,157,.25) !important;
+  }
+  .faq-item.open .faq-answer{max-height:450px !important}
+  .faq-item.open .faq-answer p{padding:18px 20px 22px !important;line-height:1.8 !important}
+}
+</style>
+
+<!-- MOBILE VISUAL IMPACT LAYER -->
+<style>
+/* Utility: show/hide by viewport */
+.d-only { display:inline }
+.m-only  { display:none  }
+
+@media(max-width:768px){
+  .d-only { display:none !important }
+  .m-only { display:inline }
+
+  /* ── HERO: bigger, punchier ─────────────────────────────── */
+  #hero h1 {
+    font-size: clamp(2.5rem,9.5vw,3.2rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.045em !important;
+    margin-bottom: 14px;
+  }
+  #hero h1 em { display:block } /* 'Tú das clase.' on its own line */
+
+  /* ── HERO STATS: hide (already hidden, reinforce) ────────── */
+  #hero-stats { display:none !important }
+
+  /* ── VSL: video-first, CTA only below ───────────────────── */
+  .vsl-bullets            { display:none !important }
+  #vsl h3                 { display:none !important }
+  .vsl-wrapper > div:last-child {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .vsl-wrapper > div:last-child > div:last-child {
+    margin-top: 0 !important;
+    width: 100%;
+  }
+  .vsl-wrapper > div:last-child > div:last-child button {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  #vsl .section-title { font-size:1.5rem !important }
+  #vsl .section-label { display:none }
+
+  /* ── FEATURE GRID: 2-col scannable ──────────────────────── */
+  .wid-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .wid-item {
+    padding: 16px 14px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+  }
+  .wid-item:last-child { grid-column: span 2 !important }
+  .wid-text p { display:none !important }
+  .wid-text h4 { font-size:.88rem !important; font-weight:600 }
+  .wid-icon { margin-bottom:0 !important; width:30px !important; height:30px !important }
+
+  /* ── SECTION DIVIDERS: visual rhythm ────────────────────── */
+  #what-it-does,
+  #bento,
+  #mechanism,
+  #objections,
+  #final-cta {
+    border-top: 1px solid rgba(0,255,157,0.09) !important;
+  }
+
+  /* ── BENTO CARDS ─────────────────────────────────────────── */
+  .bcard h3 { font-size:1.08rem !important; letter-spacing:-0.025em }
+  .bcard > p, .bcard div > p { display:none !important }
+  .handoff { display:none !important }
+
+  /* ── MECHANISM: stronger nums ───────────────────────────── */
+  .mech-step p { display:none !important }
+  .mech-step-num {
+    background: rgba(0,255,157,0.1) !important;
+    border-color: rgba(0,255,157,0.4) !important;
+    box-shadow: 0 0 14px rgba(0,255,157,0.12) !important;
+  }
+  .mech-step h3 { font-size:1rem !important; font-weight:600 }
+
+  /* ── FAQ: breathing ─────────────────────────────────────── */
+  .faq-item.open .faq-answer p {
+    -webkit-line-clamp: 5 !important;
+    line-clamp: 5 !important;
+    padding: 16px 20px 20px !important;
+  }
+
+  /* ── FINAL CTA ───────────────────────────────────────────── */
+  .cta-card h2 {
+    font-size: clamp(1.85rem,7vw,2.3rem) !important;
+    letter-spacing: -0.04em !important;
+    line-height: 1.08 !important;
+  }
+  .cta-card > div > p { display:none !important }
+  .cta-note { display:none !important }
+  .cta-btn { width:100% !important; text-align:center !important; display:block !important }
+
+  /* ── FOOTER: minimal close ───────────────────────────────── */
+  .footer-inner > div:not(:first-child) { display:none !important }
+  footer { padding:24px 20px 18px !important }
+  .footer-brand p { display:none }
+  .footer-bottom { padding-top:12px !important }
+}
+</style>
+
+<!-- FLOATING WHATSAPP BUTTON -->
+<style>
+.wa-float{
+  position:fixed;
+  bottom:28px;
+  right:24px;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#25D366;
+  color:#fff;
+  padding:12px 20px 12px 14px;
+  border-radius:50px;
+  text-decoration:none;
+  font-family:'Inter',sans-serif;
+  font-weight:600;
+  font-size:.875rem;
+  letter-spacing:-.01em;
+  box-shadow:0 8px 24px rgba(37,211,102,0.35),0 0 0 1px rgba(37,211,102,0.2);
+  transition:all .3s ease;
+  white-space:nowrap;
+}
+.wa-float:hover{
+  background:#1ebe5d;
+  box-shadow:0 8px 36px rgba(37,211,102,0.55),0 0 0 1px rgba(37,211,102,0.3);
+  transform:translateY(-2px);
+}
+.wa-float svg{flex-shrink:0}
+@media(max-width:768px){
+  .wa-float{padding:12px 16px;gap:8px;bottom:20px;right:16px}
+  .wa-float span{display:none}
+  .wa-float{border-radius:50px}
+}
+</style>
+<a href="https://wa.me/34613855535" target="_blank" rel="noopener" class="wa-float" aria-label="Contactar por WhatsApp">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span>Contacto</span>
+</a>
+
+</body>
+</html>
