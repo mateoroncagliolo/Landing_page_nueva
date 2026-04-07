@@ -20,8 +20,11 @@ export default function VSLSection() {
   };
 
   return (
-    <section id="demo" style={{
-      padding: 'clamp(40px, 8vw, 80px) 24px',
+    <section id="demo" 
+      className="px-5 md:px-[24px]"
+      style={{
+      paddingTop: 'clamp(40px, 8vw, 80px)',
+      paddingBottom: 'clamp(40px, 8vw, 80px)',
       position: 'relative'
     }}>
       {/* Ambient Glow */}
@@ -57,8 +60,9 @@ export default function VSLSection() {
             DEMOSTRACIÓN
           </div>
           
-          <h2 style={{
-            fontSize: 'clamp(36px, 4vw, 56px)',
+          <h2 
+            className="text-3xl md:text-[clamp(36px,4vw,56px)]"
+            style={{
             fontWeight: 800,
             lineHeight: '1.2',
             color: '#ffffff',
@@ -170,8 +174,9 @@ export default function VSLSection() {
 
           {/* Lado Texto & Lista */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <h3 style={{
-              fontSize: '28px',
+            <h3 
+              className="text-2xl md:text-[28px]"
+              style={{
               fontWeight: 700,
               color: '#ffffff',
               lineHeight: '1.3'

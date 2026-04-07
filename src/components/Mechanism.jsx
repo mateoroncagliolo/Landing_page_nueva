@@ -19,15 +19,18 @@ const ShieldIcon = () => (
 
 export default function Mechanism() {
   return (
-    <section style={{
-      padding: '80px 24px',
+    <section 
+      className="px-5 py-12 md:px-[24px] md:py-[80px]"
+      style={{
       maxWidth: '1100px',
       margin: '0 auto',
     }}>
       {/* Header */}
       <div style={{ marginBottom: '48px' }}>
-        <h2 style={{ fontSize: '38px', fontWeight: 800, lineHeight: '1.2', color: '#fff', marginBottom: '12px' }}>
-          Tres resultados concretos<br />
+        <h2 
+          className="text-3xl md:text-[38px]"
+          style={{ fontWeight: 800, lineHeight: '1.2', color: '#fff', marginBottom: '12px' }}>
+          Tres resultados concretos<br className="hidden md:block" />
           <span style={{ color: '#00e676' }}>desde el primer día.</span>
         </h2>
         <p style={{ fontSize: '14px', color: '#8b949e', lineHeight: '1.7' }}>

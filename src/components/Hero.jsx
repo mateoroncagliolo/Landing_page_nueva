@@ -44,17 +44,16 @@ export default function Hero() {
           </div>
 
           <h1 
-            className="text-[clamp(38px,9vw,76px)] md:text-[clamp(48px,6vw,76px)]"
+            className="text-[40px] leading-[1.1] md:text-[clamp(48px,6vw,76px)]"
             style={{
             fontWeight: 800,
-            lineHeight: '1.05',
             color: '#ffffff',
             marginBottom: '32px',
             letterSpacing: '-1px'
           }}>
-            Tu gimnasio<br />
-            responde<br />
-            solo.<br />
+            Tu gimnasio<br className="hidden md:block" />
+            responde<br className="hidden md:block" />
+            solo.<br className="hidden md:block" />
             <span className="neon-text">Tú das clase.</span>
           </h1>
 
@@ -109,9 +108,9 @@ export default function Hero() {
           </div>
 
           {/* Stats simples */}
-          <div style={{
-            display: 'flex',
-            gap: '40px',
+          <div 
+            className="grid grid-cols-2 md:flex gap-8 md:gap-[40px]"
+            style={{
             marginTop: '60px',
             paddingTop: '32px',
             borderTop: '1px solid #21262d'

@@ -107,7 +107,15 @@ const UserIcon = () => (
 
 export default function BentoGrid() {
   return (
-    <section id="sistema" style={{ padding: 'clamp(40px, 8vw, 80px) 24px', maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
+    <section id="sistema" 
+      className="px-5 md:px-[24px]"
+      style={{ 
+        paddingTop: 'clamp(40px, 8vw, 80px)',
+        paddingBottom: 'clamp(40px, 8vw, 80px)',
+        maxWidth: '900px', 
+        margin: '0 auto', 
+        position: 'relative' 
+      }}>
       {/* Header */}
       <div style={{ marginBottom: '56px', textAlign: 'center' }}>
         <div style={{
@@ -124,8 +132,10 @@ export default function BentoGrid() {
           marginBottom: '20px'
         }}>QUÉ HACE EXACTAMENTE</div>
         
-        <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', marginBottom: '20px' }}>
-          <span style={{ color: '#fff' }}>No es un bot de menús.</span><br />
+        <h2 
+          className="text-3xl md:text-[clamp(32px,4vw,48px)]"
+          style={{ fontWeight: 800, lineHeight: '1.15', marginBottom: '20px' }}>
+          <span style={{ color: '#fff' }}>No es un bot de menús.</span><br className="hidden md:block" />
           <span style={{ color: '#fff' }}>Es un </span>
           <span className="neon-text">asistente que convierte conversaciones en reservas.</span>
         </h2>

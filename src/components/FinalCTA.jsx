@@ -8,8 +8,11 @@ export default function FinalCTA() {
   };
 
   return (
-    <section style={{
-      padding: 'clamp(40px, 8vw, 100px) 24px',
+    <section 
+      className="px-5 md:px-[24px]"
+      style={{
+      paddingTop: 'clamp(40px, 8vw, 100px)',
+      paddingBottom: 'clamp(40px, 8vw, 100px)',
       background: '#0d1117',
       position: 'relative'
     }}>
@@ -32,8 +35,10 @@ export default function FinalCTA() {
         padding: '64px 32px',
         textAlign: 'center',
       }}>
-        <h2 style={{ fontSize: 'clamp(32px, 4vw, 42px)', fontWeight: 800, color: '#fff', lineHeight: '1.2', marginBottom: '24px' }}>
-          Haz que tu WhatsApp responda<br />
+        <h2 
+          className="text-[28px] md:text-[clamp(32px,4vw,42px)]"
+          style={{ fontWeight: 800, color: '#fff', lineHeight: '1.2', marginBottom: '24px' }}>
+          Haz que tu WhatsApp responda<br className="hidden md:block" />
           <span className="neon-text">aunque tú estés dando clase.</span>
         </h2>
         <p style={{ fontSize: '15px', color: '#8b949e', maxWidth: '520px', margin: '0 auto 40px', lineHeight: '1.7' }}>
