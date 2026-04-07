@@ -68,7 +68,7 @@ const FeatureCard = ({ icon, title, desc, fullWidth }) => {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <IconBox>{icon}</IconBox>
         <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>{title}</h3>
-        <p style={{ fontSize: '14px', color: '#8b949e', lineHeight: '1.6' }}>{desc}</p>
+        <p className="hidden md:block" style={{ fontSize: '14px', color: '#8b949e', lineHeight: '1.6' }}>{desc}</p>
       </div>
     </div>
   );
@@ -138,7 +138,7 @@ export default function BentoGrid() {
       {/* Feature grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '20px',
       }}>
         <FeatureCard

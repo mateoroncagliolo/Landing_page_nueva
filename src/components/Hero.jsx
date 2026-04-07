@@ -18,12 +18,12 @@ export default function Hero() {
       position: 'relative',
       zIndex: 1,
     }}>
-      <div style={{
+      <div 
+        className="flex flex-col lg:grid lg:grid-cols-[1.1fr_1fr]"
+        style={{
         maxWidth: '1240px',
         margin: '0 auto',
         width: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'minmax(400px, 1.1fr) minmax(350px, 1fr)',
         gap: '80px',
         alignItems: 'center',
       }}>
@@ -43,8 +43,9 @@ export default function Hero() {
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#00ffa3', letterSpacing: '0.08em' }}>AUTOMATIZACIÓN DE WHATSAPP PARA GIMNASIOS</span>
           </div>
 
-          <h1 style={{
-            fontSize: 'clamp(48px, 6vw, 76px)',
+          <h1 
+            className="text-[clamp(38px,9vw,76px)] md:text-[clamp(48px,6vw,76px)]"
+            style={{
             fontWeight: 800,
             lineHeight: '1.05',
             color: '#ffffff',
@@ -57,7 +58,9 @@ export default function Hero() {
             <span className="neon-text">Tú das clase.</span>
           </h1>
 
-          <p style={{
+          <p 
+            className="hidden md:block"
+            style={{
             fontSize: '18px',
             color: '#8b949e',
             lineHeight: '1.6',
@@ -101,7 +104,7 @@ export default function Hero() {
             {/* Social Proof / Niche indicator */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', fontSize: '12px', color: '#6e7681' }}>
               <span>Especializado para: </span>
-              <strong style={{ color: '#8b949e' }}>CrossFit · Artes Marciales · Prácticas de Yoga</strong>
+              <strong style={{ color: '#8b949e' }}>centros locales</strong>
             </div>
           </div>
 
@@ -129,7 +132,7 @@ export default function Hero() {
         </div>
 
         {/* Lado Visual (WhatsApp Demo) */}
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+        <div className="hidden lg:flex" style={{ position: 'relative', justifyContent: 'center', width: '100%' }}>
           
           {/* Fondo Glow */}
           <div style={{

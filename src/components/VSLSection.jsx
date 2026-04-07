@@ -74,15 +74,10 @@ export default function VSLSection() {
         </div>
 
         {/* Content Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '60px',
+        <div 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-[60px]"
+          style={{
           alignItems: 'center',
-          '@media (max-width: 900px)': {
-            gridTemplateColumns: '1fr',
-            gap: '40px'
-          }
         }}>
           
           {/* Lado Video */}
@@ -207,7 +202,7 @@ export default function VSLSection() {
                     </svg>
                   </div>
                   <p style={{ color: '#8b949e', fontSize: '15px', lineHeight: '1.5' }}>
-                    <span style={{ color: '#fff', fontWeight: 600 }}>{item.bold}</span>{item.rest}
+                    <span style={{ color: '#fff', fontWeight: 600 }}>{item.bold}</span><span className="hidden md:inline">{item.rest}</span>
                   </p>
                 </div>
               ))}

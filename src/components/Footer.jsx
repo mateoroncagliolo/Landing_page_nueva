@@ -9,9 +9,10 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{
+    <footer 
+      className="px-6 py-8 md:px-6 md:pt-[64px] md:pb-8"
+      style={{
       borderTop: '1px solid #21262d',
-      padding: '64px 24px 32px',
       background: '#0d1117',
     }}>
       <div style={{
@@ -19,14 +20,14 @@ export default function Footer() {
         margin: '0 auto',
       }}>
         {/* Top area */}
-        <div style={{
+        <div 
+          className="gap-8 mb-8 md:gap-10 md:mb-[64px]"
+          style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '40px',
-          marginBottom: '64px',
         }}>
           {/* Brand */}
-          <div style={{ gridColumn: '1 / -1', '@media(min-width: 768px)': { gridColumn: 'span 2' } }}>
+          <div className="col-span-full md:col-span-2">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <img 
                 src="/logo.png" 

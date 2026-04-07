@@ -36,7 +36,7 @@ export default function Mechanism() {
       </div>
 
       {/* Row 1: 2 cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '16px', marginBottom: '16px' }}>
         
         {/* Card 1: Cero leads */}
         <div className="card" style={{ padding: '28px', position: 'relative', overflow: 'hidden' }}>
@@ -114,7 +114,7 @@ export default function Mechanism() {
       </div>
 
       {/* Row 2: 1 card full */}
-      <div className="card" style={{ padding: '28px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', alignItems: 'center' }}>
+      <div className="card grid grid-cols-1 md:grid-cols-2" style={{ padding: '28px', gap: '32px', alignItems: 'center' }}>
         <div>
           <div style={{
             width: '40px', height: '40px',
