@@ -44,16 +44,16 @@ export default function Hero() {
           </div>
 
           <h1 
-            className="text-[40px] leading-[1.1] md:text-[clamp(48px,6vw,76px)]"
+            className="text-[40px] leading-[1.1] md:text-[clamp(48px,6vw,76px)] max-w-full break-words"
             style={{
             fontWeight: 800,
             color: '#ffffff',
             marginBottom: '32px',
             letterSpacing: '-1px'
           }}>
-            Tu gimnasio<br className="hidden md:block" />
-            responde<br className="hidden md:block" />
-            solo.<br className="hidden md:block" />
+            Tu gimnasio <br className="hidden md:block" />
+            responde <br className="hidden md:block" />
+            solo. <br className="hidden md:block" />
             <span className="neon-text">Tú das clase.</span>
           </h1>
 
@@ -69,14 +69,15 @@ export default function Hero() {
             FlowMint responde al instante por WhatsApp con la información real de tu centro, resuelve dudas, guía a los interesados a reservar una clase de prueba y avisa a tu equipo cuando hace falta una persona.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'flex-start' }}>
-            <button onClick={openCalendly} className="neon-btn" style={{ fontSize: '18px', padding: '20px 44px' }}>
+          <div className="flex flex-col gap-4 md:gap-[18px] items-start w-full">
+            <button onClick={openCalendly} className="neon-btn w-full md:w-auto" style={{ fontSize: '18px', padding: '16px 32px' }}>
               Reservar Auditoría Gratuita
             </button>
             <button
               onClick={() => {
                 document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
               }}
+              className="w-full md:w-auto text-[16px]"
               style={{
                 background: 'transparent',
                 color: '#8b949e',
@@ -84,7 +85,6 @@ export default function Hero() {
                 padding: '16px 36px',
                 borderRadius: '50px',
                 fontWeight: 600,
-                fontSize: '16px',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
@@ -109,23 +109,23 @@ export default function Hero() {
 
           {/* Stats simples */}
           <div 
-            className="grid grid-cols-2 md:flex gap-8 md:gap-[40px]"
+            className="grid grid-cols-2 md:flex gap-6 md:gap-[40px] w-full"
             style={{
             marginTop: '60px',
             paddingTop: '32px',
             borderTop: '1px solid #21262d'
           }}>
-            <div>
-              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>Inmediata</div>
-              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Respuesta en WhatsApp</div>
+            <div className="w-full">
+              <div className="neon-text text-[26px] md:text-[32px] font-[800]">Inmediata</div>
+              <div className="text-[13px] md:text-[14px] text-[#8b949e] mt-1">Respuesta en WhatsApp</div>
             </div>
-            <div>
-              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>24/7</div>
-              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Disponibilidad</div>
+            <div className="w-full">
+              <div className="neon-text text-[26px] md:text-[32px] font-[800]">24/7</div>
+              <div className="text-[13px] md:text-[14px] text-[#8b949e] mt-1">Disponibilidad</div>
             </div>
-            <div>
-              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>0</div>
-              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Respuestas inventadas</div>
+            <div className="w-full col-span-2 md:col-span-1">
+              <div className="neon-text text-[26px] md:text-[32px] font-[800]">0</div>
+              <div className="text-[13px] md:text-[14px] text-[#8b949e] mt-1">Respuestas inventadas</div>
             </div>
           </div>
         </div>

@@ -38,8 +38,12 @@ export default function FinalCTA() {
         <h2 
           className="text-[28px] md:text-[clamp(32px,4vw,42px)]"
           style={{ fontWeight: 800, color: '#fff', lineHeight: '1.2', marginBottom: '24px' }}>
-          Haz que tu WhatsApp responda<br className="hidden md:block" />
-          <span className="neon-text">aunque tú estés dando clase.</span>
+          Haz que tu WhatsApp <br className="md:hidden" />
+          responda <br className="hidden md:block" />
+          <span className="neon-text">
+            aunque <br className="md:hidden" />
+            tú estés dando clase.
+          </span>
         </h2>
         <p style={{ fontSize: '15px', color: '#8b949e', maxWidth: '520px', margin: '0 auto 40px', lineHeight: '1.7' }}>
           Agenda una auditoría gratuita. Analizamos juntos cómo llegan tus leads ahora y te mostramos exactamente qué mejoraría con FlowMint, sin compromiso ni presión.

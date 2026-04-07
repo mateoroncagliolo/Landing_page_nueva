@@ -31,11 +31,13 @@ export default function Navbar() {
       transition: 'all 0.3s ease',
       pointerEvents: 'none' // allow clicking through the wrapper
     }}>
-      <nav style={{
-        pointerEvents: 'auto', // but capture clicks on nav
+      {/* Desktop Navbar */}
+      <nav 
+        className="hidden md:flex"
+        style={{
+        pointerEvents: 'auto',
         width: '100%',
         maxWidth: '1200px',
-        display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '12px 24px',
@@ -52,16 +54,13 @@ export default function Navbar() {
             alt="FlowMint Logo" 
             style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
           />
-          <span className="hidden md:inline" style={{ fontWeight: 700, fontSize: '15px', color: '#fff' }}>
+          <span style={{ fontWeight: 700, fontSize: '15px', color: '#fff' }}>
             FlowMint <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500, fontSize: '13px', color: '#00ffa3', letterSpacing: '0.1em', marginLeft: '2px' }}>AUTOMATIONS</span>
           </span>
         </div>
 
-
-
         <button 
           onClick={openCalendly}
-          className="hidden md:block"
           style={{
             background: '#00ffa3',
             color: '#0d1117',
@@ -86,6 +85,15 @@ export default function Navbar() {
           Auditoría Gratuita →
         </button>
       </nav>
+
+      {/* Mobile Floating Logo */}
+      <div className="md:hidden absolute top-6 left-6 pointer-events-auto">
+        <img 
+          src="/logo.png" 
+          alt="FlowMint Logo" 
+          style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+        />
+      </div>
     </div>
   );
 }

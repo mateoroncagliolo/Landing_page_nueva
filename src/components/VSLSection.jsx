@@ -111,7 +111,7 @@ export default function VSLSection() {
                     height: '100%',
                     objectFit: 'contain', 
                     objectPosition: 'center',
-                    zIndex: 1
+                    zIndex: 10
                   }}
                   onError={(e) => {
                     // Fallback visual just in case image is missing
@@ -164,9 +164,9 @@ export default function VSLSection() {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                display: isPlaying ? 'block' : 'none',
+                display: 'block',
                 position: 'relative',
-                zIndex: 3,
+                zIndex: 1,
                 backgroundColor: '#000'
               }}
             />
