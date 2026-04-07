@@ -1,100 +1,236 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MessageCircle, CheckCircle2 } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
+import React from 'react';
 
 export default function Hero() {
-  const containerRef = useRef(null);
-  const visualRef = useRef(null);
-
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Text cascade animation
-      gsap.fromTo('.hero-text', 
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: 'power3.out', delay: 0.5 }
-      );
-
-      // 3D Visual animation on load and scroll
-      gsap.fromTo(visualRef.current,
-        { rotateX: 25, rotateY: -10, y: 100, opacity: 0, scale: 0.9 },
-        { rotateX: 10, rotateY: -5, y: 0, opacity: 1, scale: 1, duration: 1.5, ease: 'power3.out', delay: 0.8 }
-      );
-
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: 1,
-        animation: gsap.to(visualRef.current, { rotateX: 0, rotateY: 0, scale: 1.05 })
+  const openCalendly = () => {
+    if (window.Calendly) {
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/mateo-flowmintautomations/consultoria-gratuita',
       });
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
+    }
+  };
 
   return (
-    <section ref={containerRef} className="relative min-h-screen pt-40 pb-20 px-6 flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-champagne/10 rounded-full blur-[120px] -z-10"></div>
-      
-      <div className="text-center max-w-4xl mx-auto z-10">
-        <div className="hero-text inline-block mb-4 px-4 py-1.5 rounded-full border border-champagne/30 bg-champagne/5 text-champagne font-data text-xs uppercase tracking-widest">
-          Sistemas de Conversión para Gimnasios
-        </div>
-        <h1 className="hero-text text-5xl md:text-7xl font-semibold mb-6 leading-tight">
-          Deja de Perder Alumnos <br className="hidden md:block"/> 
-          <span className="font-drama text-champagne text-glow">Mientras Das Clase.</span>
-        </h1>
-        <p className="hero-text text-lg md:text-xl text-ivory/70 mb-10 max-w-2xl mx-auto font-light">
-          Respondemos al instante por WhatsApp, agendamos pruebas y filtramos interesados. Tú concéntrate en el entrenamiento, nosotros automatizamos la captación.
-        </p>
-        
-        <div className="hero-text flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button className="w-full sm:w-auto bg-champagne hover:bg-champagne-light text-obsidian font-medium font-sans px-8 py-4 rounded-xl transition-all duration-300 shadow-[0_0_30px_rgba(201,168,76,0.3)] hover:shadow-[0_0_40px_rgba(201,168,76,0.5)]">
-            Reservar Auditoría Gratuita
-          </button>
-          <button className="w-full sm:w-auto glass-card hover:bg-white/5 text-ivory font-medium font-sans px-8 py-4 rounded-xl transition-all duration-300">
-            Ver cómo funciona
-          </button>
-        </div>
-      </div>
+    <section style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      padding: 'clamp(100px, 15vw, 160px) 24px clamp(40px, 8vw, 80px)',
+      position: 'relative',
+      zIndex: 1,
+    }}>
+      <div style={{
+        maxWidth: '1240px',
+        margin: '0 auto',
+        width: '100%',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(400px, 1.1fr) minmax(350px, 1fr)',
+        gap: '80px',
+        alignItems: 'center',
+      }}>
+        {/* Lado Textual */}
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 16px',
+            borderRadius: '50px',
+            border: '1px solid rgba(0, 255, 163, 0.2)',
+            background: 'rgba(0, 255, 163, 0.05)',
+            marginBottom: '32px',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00ffa3', boxShadow: '0 0 8px #00ffa3' }}></span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#00ffa3', letterSpacing: '0.08em' }}>AUTOMATIZACIÓN DE WHATSAPP PARA GIMNASIOS</span>
+          </div>
 
-      {/* 3D Visual Mockup */}
-      <div ref={visualRef} className="mt-20 w-full max-w-3xl glass-card border-slate/50 p-6 relative z-10" style={{ transformPerspective: "1200px" }}>
-        <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-slate"></div>
-            <div className="w-3 h-3 rounded-full bg-slate"></div>
-            <div className="w-3 h-3 rounded-full bg-slate"></div>
+          <h1 style={{
+            fontSize: 'clamp(48px, 6vw, 76px)',
+            fontWeight: 800,
+            lineHeight: '1.05',
+            color: '#ffffff',
+            marginBottom: '32px',
+            letterSpacing: '-1px'
+          }}>
+            Tu gimnasio<br />
+            responde<br />
+            solo.<br />
+            <span className="neon-text">Tú das clase.</span>
+          </h1>
+
+          <p style={{
+            fontSize: '18px',
+            color: '#8b949e',
+            lineHeight: '1.6',
+            maxWidth: '520px',
+            marginBottom: '40px'
+          }}>
+            FlowMint responde al instante por WhatsApp con la información real de tu centro, resuelve dudas, guía a los interesados a reservar una clase de prueba y avisa a tu equipo cuando hace falta una persona.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'flex-start' }}>
+            <button onClick={openCalendly} className="neon-btn" style={{ fontSize: '18px', padding: '20px 44px' }}>
+              Reservar Auditoría Gratuita
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                background: 'transparent',
+                color: '#8b949e',
+                border: '1px solid #21262d',
+                padding: '16px 36px',
+                borderRadius: '50px',
+                fontWeight: 600,
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseOver={e => {
+                e.target.style.color = '#fff';
+                e.target.style.borderColor = '#484f58';
+              }}
+              onMouseOut={e => {
+                e.target.style.color = '#8b949e';
+                e.target.style.borderColor = '#21262d';
+              }}
+            >
+              Ver cómo funciona
+            </button>
+            
+            {/* Social Proof / Niche indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', fontSize: '12px', color: '#6e7681' }}>
+              <span>Especializado para: </span>
+              <strong style={{ color: '#8b949e' }}>CrossFit · Artes Marciales · Prácticas de Yoga</strong>
+            </div>
           </div>
-          <div className="font-data text-xs text-ivory/50">whatsapp_flow.json</div>
+
+          {/* Stats simples */}
+          <div style={{
+            display: 'flex',
+            gap: '40px',
+            marginTop: '60px',
+            paddingTop: '32px',
+            borderTop: '1px solid #21262d'
+          }}>
+            <div>
+              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>Inmediata</div>
+              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Respuesta en WhatsApp</div>
+            </div>
+            <div>
+              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>24/7</div>
+              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Disponibilidad</div>
+            </div>
+            <div>
+              <div className="neon-text" style={{ fontSize: '32px', fontWeight: 800 }}>0</div>
+              <div style={{ fontSize: '14px', color: '#8b949e', marginTop: '4px' }}>Respuestas inventadas</div>
+            </div>
+          </div>
         </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 rounded-full bg-slate flex-shrink-0 flex items-center justify-center">
-              <span className="text-xs">U</span>
-            </div>
-            <div className="bg-slate/50 p-4 rounded-2xl rounded-tl-sm text-sm text-ivory/90 max-w-[80%]">
-              Hola, vi el anuncio en Instagram. ¿Tienen clases de prueba para Crossfit hoy por la tarde?
-            </div>
-          </div>
+
+        {/* Lado Visual (WhatsApp Demo) */}
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
           
-          <div className="flex items-start gap-4 flex-row-reverse">
-            <div className="w-8 h-8 rounded-full bg-champagne flex-shrink-0 flex items-center justify-center text-obsidian">
-              <MessageCircle size={16} />
+          {/* Fondo Glow */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '400px',
+            height: '400px',
+            background: 'radial-gradient(circle, rgba(0,255,163,0.15) 0%, transparent 70%)',
+            zIndex: 0
+          }}></div>
+
+          <div
+            className="float-3d"
+            style={{
+              width: '100%',
+              maxWidth: '320px',
+              background: '#161b22',
+              borderRadius: '20px',
+              border: '1px solid #21262d',
+              overflow: 'hidden',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            {/* Header del Chat */}
+            <div style={{
+              background: '#0d1117',
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              borderBottom: '1px solid #21262d'
+            }}>
+              <div style={{
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: '#00ffa3', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#0d1117', fontWeight: 700, fontSize: '13px'
+              }}>
+                CE
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: '14px', color: '#fff' }}>CrossFit Élite</div>
+                <div style={{ fontSize: '11px', color: '#00ffa3', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00ffa3' }}></span>
+                  en línea
+                </div>
+              </div>
+              <div style={{ color: '#8b949e', fontSize: '12px' }}>•••</div>
             </div>
-            <div className="bg-champagne/10 border border-champagne/20 p-4 rounded-2xl rounded-tr-sm text-sm text-ivory max-w-[80%]">
-              ¡Hola! Sí, claro. Tenemos un cupo libre a las 18:00h y otro a las 19:30h. ¿En cuál te gustaría reservar tu clase de prueba? 🏋️‍♂️
-              <div className="mt-3 flex items-center gap-2 text-xs text-champagne font-data">
-                <CheckCircle2 size={12} /> Respondido en 2.4s (Automático)
+
+            {/* Cuerpo del Chat */}
+            <div style={{ padding: '16px', backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <span style={{ background: '#21262d', padding: '4px 10px', borderRadius: '12px', fontSize: '10px', color: '#8b949e' }}>HOY</span>
+              </div>
+
+              {/* Mensaje Cliente */}
+              <div style={{ background: '#21262d', padding: '10px 14px', borderRadius: '16px 16px 16px 4px', color: '#fff', fontSize: '13px', maxWidth: '85%', marginBottom: '12px', lineHeight: '1.4' }}>
+                ¡Hola! Vi vuestro anuncio en Instagram. ¿Tenéis clases de prueba de CrossFit?
+                <div style={{ fontSize: '9px', color: '#8b949e', textAlign: 'right', marginTop: '2px' }}>18:42</div>
+              </div>
+
+              {/* Mensaje Bot */}
+              <div style={{ background: 'rgba(0,255,163,0.1)', border: '1px solid rgba(0,255,163,0.2)', padding: '10px 14px', borderRadius: '16px 16px 4px 16px', color: '#fff', fontSize: '13px', maxWidth: '85%', marginLeft: 'auto', marginBottom: '4px', lineHeight: '1.4' }}>
+                ¡Hola! ¡Bienvenido! 👋 Sí, tenemos clases de prueba completamente gratuitas. Tenemos hueco hoy a las 19:00h y mañana a las 7:30h y 18:00h. ¿Cuál te va mejor?
+                <div style={{ fontSize: '9px', color: '#00ffa3', textAlign: 'right', marginTop: '2px' }}>18:42 ✓✓</div>
+              </div>
+              
+              <div style={{ fontSize: '9px', color: '#00ffa3', textAlign: 'right', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                ✦ Respondido automáticamente en 1.8s
+              </div>
+
+              {/* Mensaje Cliente 2 */}
+              <div style={{ background: '#21262d', padding: '10px 14px', borderRadius: '16px 16px 16px 4px', color: '#fff', fontSize: '13px', maxWidth: '85%', marginBottom: '12px', lineHeight: '1.4' }}>
+                ¿Cuánto cuesta la matrícula si me apunto?
+                <div style={{ fontSize: '9px', color: '#8b949e', textAlign: 'right', marginTop: '2px' }}>18:44</div>
+              </div>
+              
+              {/* Mensaje Bot 2 */}
+              <div style={{ background: 'rgba(0,255,163,0.1)', border: '1px solid rgba(0,255,163,0.2)', padding: '10px 14px', borderRadius: '16px 16px 4px 16px', color: '#fff', fontSize: '13px', maxWidth: '85%', marginLeft: 'auto', marginBottom: '16px', lineHeight: '1.4' }}>
+                La matrícula es de 30€ y la cuota mensual de 65€ con acceso ilimitado. Si reservas la prueba esta semana te regalo la matrícula 🎁
+                <div style={{ fontSize: '9px', color: '#00ffa3', textAlign: 'right', marginTop: '2px' }}>18:44 ✓✓</div>
+              </div>
+
+            </div>
+
+            {/* Input Chat */}
+            <div style={{ padding: '12px', background: '#0d1117', borderTop: '1px solid #21262d', display: 'flex', gap: '10px' }}>
+              <div style={{ flex: 1, background: '#161b22', borderRadius: '20px', padding: '10px 14px', color: '#8b949e', fontSize: '13px' }}>Escribe un mensaje...</div>
+              <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#00ffa3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d1117" style={{ marginLeft: '2px' }}>
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
               </div>
             </div>
+            
           </div>
         </div>
+
       </div>
     </section>
   );

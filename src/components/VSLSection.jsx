@@ -1,25 +1,8 @@
-import { useState, useRef } from 'react';
-import { Play, CheckCircle2, CalendarDays } from 'lucide-react';
-
-const bullets = [
-  "Ve exactamente cómo FlowMint responde a un lead real en segundos",
-  "Sin guiones de venta. Sin menús. Una conversación natural que termina en reserva",
-  "Entiende por qué el tiempo de respuesta es el mayor filtro de conversión en tu gimnasio",
-  "Descubre cómo se activa el traspaso al equipo humano cuando hace falta",
-];
+import React, { useState, useRef } from 'react';
 
 export default function VSLSection() {
-  const [playing, setPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null);
-
-  const handlePlay = () => {
-    setPlaying(true);
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.play();
-      }
-    }, 50);
-  };
 
   const openCalendly = () => {
     if (window.Calendly) {
@@ -29,76 +12,214 @@ export default function VSLSection() {
     }
   };
 
+  const handlePlayClick = () => {
+    setIsPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
+
   return (
-    <section id="vsl-section" className="py-24 px-6 max-w-7xl mx-auto">
-      <div className="text-center mb-12">
-        <div className="inline-block mb-4 px-4 py-1.5 rounded-full border border-champagne/30 bg-champagne/5 text-champagne font-data text-xs uppercase tracking-widest">
-          Míralo en acción
+    <section id="demo" style={{
+      padding: 'clamp(40px, 8vw, 80px) 24px',
+      position: 'relative'
+    }}>
+      {/* Ambient Glow */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(circle at center, rgba(0,255,163,0.02) 0%, transparent 60%)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }}></div>
+      
+      <div style={{ maxWidth: '1240px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        
+        {/* Header de Sección */}
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <div style={{
+            display: 'inline-block',
+            padding: '6px 16px',
+            borderRadius: '50px',
+            border: '1px solid rgba(0, 255, 163, 0.2)',
+            background: 'rgba(0, 255, 163, 0.05)',
+            color: '#00ffa3',
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            marginBottom: '20px'
+          }}>
+            DEMOSTRACIÓN
+          </div>
+          
+          <h2 style={{
+            fontSize: 'clamp(36px, 4vw, 56px)',
+            fontWeight: 800,
+            lineHeight: '1.2',
+            color: '#ffffff',
+            letterSpacing: '-1px'
+          }}>
+            Mira cómo funciona<br/>
+            <span style={{ 
+              color: '#00ffa3',
+            }}>
+              en menos de 2 minutos
+            </span>
+          </h2>
         </div>
-        <h2 className="text-3xl md:text-5xl font-semibold mb-4">
-          Lo que hace FlowMint,{' '}
-          <span className="font-drama text-champagne">en menos de 3 minutos.</span>
-        </h2>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Video / Thumbnail */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(201,168,76,0.1)] group">
-          {!playing ? (
-            <div
-              className="relative cursor-pointer"
-              onClick={handlePlay}
-            >
-              <img
-                src="/VSL cover.png"
-                alt="Ver demostración de FlowMint"
-                className="w-full h-auto object-cover block"
-              />
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-obsidian/40 group-hover:bg-obsidian/30 transition-colors duration-300" />
-              {/* Play button */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-champagne flex items-center justify-center shadow-[0_0_40px_rgba(201,168,76,0.5)] group-hover:shadow-[0_0_60px_rgba(201,168,76,0.7)] group-hover:scale-110 transition-all duration-300">
-                  <Play className="text-obsidian w-8 h-8 ml-1" fill="currentColor" />
+        {/* Content Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '60px',
+          alignItems: 'center',
+          '@media (max-width: 900px)': {
+            gridTemplateColumns: '1fr',
+            gap: '40px'
+          }
+        }}>
+          
+          {/* Lado Video */}
+          <div style={{
+            width: '100%',
+            aspectRatio: '16/9',
+            position: 'relative',
+            borderRadius: '24px',
+            overflow: 'hidden',
+            border: '1px solid #21262d',
+            background: '#161b22',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+            cursor: isPlaying ? 'default' : 'pointer'
+          }} onClick={!isPlaying ? handlePlayClick : undefined}>
+            
+            {/* Si no se está reproduciendo, mostrar la miniatura (VSL cover) */}
+            {!isPlaying && (
+              <>
+                <img 
+                  src="/VSL_cover.png" 
+                  alt="Video Cover" 
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain', 
+                    objectPosition: 'center',
+                    zIndex: 1
+                  }}
+                  onError={(e) => {
+                    // Fallback visual just in case image is missing
+                    e.target.style.display = 'none';
+                  }}
+                />
+                
+                {/* Fallback Overlay (in case image is empty/fails, text still shows) */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0, left: 0, width: '100%', height: '100%',
+                  background: 'linear-gradient(135deg, rgba(22, 27, 34, 0.8) 0%, rgba(13, 17, 23, 0.9) 100%)',
+                  zIndex: 0
+                }}></div>
+                
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 2,
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: '#00ffa3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 30px rgba(0, 255, 163, 0.4)',
+                  transition: 'transform 0.2s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#0d1117" style={{ marginLeft: '4px' }}>
+                    <path d="M5 3l14 9-14 9V3z"/>
+                  </svg>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <video
+              </>
+            )}
+
+            {/* Video Player */}
+            <video 
               ref={videoRef}
-              src="/VSL.mp4"
-              controls
-              autoPlay
-              className="w-full h-auto block"
+              src="/VSL.mp4" 
+              controls={isPlaying}
+              playsInline
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: isPlaying ? 'block' : 'none',
+                position: 'relative',
+                zIndex: 3,
+                backgroundColor: '#000'
+              }}
             />
-          )}
-        </div>
+          </div>
 
-        {/* Bullets + CTA */}
-        <div className="flex flex-col justify-center gap-8">
-          <div className="space-y-5">
-            {bullets.map((bullet, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-champagne/10 border border-champagne/30 flex items-center justify-center mt-0.5">
-                  <CheckCircle2 className="text-champagne w-3.5 h-3.5" />
+          {/* Lado Texto & Lista */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <h3 style={{
+              fontSize: '28px',
+              fontWeight: 700,
+              color: '#ffffff',
+              lineHeight: '1.3'
+            }}>
+              Ve exactamente lo que ocurre desde que el lead escribe hasta que reserva
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {[
+                { bold: "Respuesta automática", rest: " en WhatsApp usando solo la información real de tu gimnasio." },
+                { bold: "Detecta intención y guía", rest: " al interesado a reservar una clase de prueba sin que intervenga nadie." },
+                { bold: "Avisa a tu equipo", rest: " cuando hay algo que requiere una persona real. Tú siempre tienes el control." }
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                  <div style={{
+                    minWidth: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'rgba(0, 255, 163, 0.1)',
+                    border: '1px solid rgba(0, 255, 163, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '2px'
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6L9 17l-5-5" stroke="#00ffa3" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <p style={{ color: '#8b949e', fontSize: '15px', lineHeight: '1.5' }}>
+                    <span style={{ color: '#fff', fontWeight: 600 }}>{item.bold}</span>{item.rest}
+                  </p>
                 </div>
-                <p className="text-ivory/80 font-light leading-relaxed">{bullet}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div style={{ marginTop: '16px' }}>
+              <button onClick={openCalendly} className="neon-btn" style={{ fontSize: '16px', padding: '18px 36px' }}>
+                Reservar Auditoría Gratuita →
+              </button>
+            </div>
           </div>
 
-          <div className="pt-2">
-            <p className="text-ivory/50 text-sm font-light mb-5">
-              Si después de verlo tienes dudas, te las resolvemos en una auditoría de 30 minutos sin coste.
-            </p>
-            <button
-              onClick={openCalendly}
-              className="inline-flex items-center gap-3 bg-champagne hover:bg-champagne-light text-obsidian font-semibold font-sans px-8 py-4 rounded-xl transition-all duration-300 shadow-[0_0_30px_rgba(201,168,76,0.3)] hover:shadow-[0_0_45px_rgba(201,168,76,0.5)] hover:-translate-y-0.5"
-            >
-              <CalendarDays size={20} />
-              Reservar Auditoría Gratuita
-            </button>
-          </div>
         </div>
       </div>
     </section>

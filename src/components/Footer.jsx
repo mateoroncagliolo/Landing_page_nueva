@@ -1,43 +1,82 @@
 export default function Footer() {
+  const openCalendly = (e) => {
+    e.preventDefault();
+    if (window.Calendly) {
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/mateo-flowmintautomations/consultoria-gratuita',
+      });
+    }
+  };
+
   return (
-    <footer className="border-t border-white/5 bg-obsidian py-12 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-champagne flex items-center justify-center text-obsidian font-bold text-xs">F</div>
-            <span className="font-serif italic text-lg text-ivory">FlowMint <span className="font-sans text-xs font-light not-italic text-ivory/60 uppercase tracking-widest">Auto</span></span>
+    <footer style={{
+      borderTop: '1px solid #21262d',
+      padding: '64px 24px 32px',
+      background: '#0d1117',
+    }}>
+      <div style={{
+        maxWidth: '1100px',
+        margin: '0 auto',
+      }}>
+        {/* Top area */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '40px',
+          marginBottom: '64px',
+        }}>
+          {/* Brand */}
+          <div style={{ gridColumn: '1 / -1', '@media(min-width: 768px)': { gridColumn: 'span 2' } }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <img 
+                src="/logo.png" 
+                alt="FlowMint Logo" 
+                style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+              />
+              <span style={{ fontWeight: 700, fontSize: '15px', color: '#fff' }}>
+                FlowMint <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500, fontSize: '13px', color: '#00ffa3', letterSpacing: '0.1em', marginLeft: '2px' }}>AUTOMATIONS</span>
+              </span>
+            </div>
+            <p style={{ fontSize: '13px', color: '#8b949e', lineHeight: '1.7', maxWidth: '300px' }}>
+              Automatización de WhatsApp para gimnasios boutique, centros de artes marciales y entrenadores especializados.
+            </p>
           </div>
-          <p className="text-ivory/50 font-light max-w-xs text-sm">
-            Creando sistemas invisibles de conversión y retención para centros fitness, artes marciales y clínicas especializadas.
-          </p>
-        </div>
-        
-        <div>
-          <h4 className="font-medium mb-4">Soluciones</h4>
-          <ul className="space-y-3 text-sm text-ivory/60 font-light">
-            <li><a href="#" className="hover:text-champagne transition-colors">Para Gimnasios</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Para Entrenadores Personales</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Para Centros Boutique</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Auditoría Gratuita</a></li>
-          </ul>
+
+          {/* Links 1 */}
+          <div>
+            <h4 className="label-tag" style={{ marginBottom: '20px', border: 'none', background: 'transparent', padding: 0 }}>SERVICIOS</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <a href="#sistema" style={{ fontSize: '13px', color: '#8b949e', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#8b949e'}>Automatización de WhatsApp</a>
+              <a href="#" onClick={openCalendly} style={{ fontSize: '13px', color: '#8b949e', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#8b949e'}>Auditoría Gratuita</a>
+              <a href="https://wa.me/34613855535" target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: '#8b949e', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#8b949e'}>Contacto por WhatsApp</a>
+            </div>
+          </div>
+
+          {/* Links 2 */}
+          <div>
+            <h4 className="label-tag" style={{ marginBottom: '20px', border: 'none', background: 'transparent', padding: 0 }}>LEGAL</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <a href="#" style={{ fontSize: '13px', color: '#8b949e', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#8b949e'}>Política de Privacidad</a>
+              <a href="#" style={{ fontSize: '13px', color: '#8b949e', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#8b949e'}>Términos de Servicio</a>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h4 className="font-medium mb-4">Empresa</h4>
-          <ul className="space-y-3 text-sm text-ivory/60 font-light">
-            <li><a href="#" className="hover:text-champagne transition-colors">Sobre Nosotros</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Casos de Éxito</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Privacidad</a></li>
-            <li><a href="#" className="hover:text-champagne transition-colors">Términos Legales</a></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-data text-ivory/30">
-        <p>© 2026 FlowMint Automations. Todos los derechos reservados.</p>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full border border-champagne/50 bg-champagne/20"></span>
-          Sistema Operativo: 100%
+        {/* Bottom area */}
+        <div style={{
+          paddingTop: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}>
+          <p style={{ fontSize: '12px', color: '#6e7681' }}>
+            © 2024 FlowMint Automations. Todos los derechos reservados.
+          </p>
+          <p style={{ fontSize: '12px', color: '#6e7681' }}>
+            Hecho con intención.
+          </p>
         </div>
       </div>
     </footer>

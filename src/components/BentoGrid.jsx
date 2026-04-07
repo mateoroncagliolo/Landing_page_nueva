@@ -1,112 +1,198 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Zap, CalendarCheck, ShieldCheck } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 
-gsap.registerPlugin(ScrollTrigger);
+const IconBox = ({ children }) => (
+  <div style={{
+    width: '40px',
+    height: '40px',
+    background: 'rgba(0, 255, 163, 0.08)',
+    border: '1px solid rgba(0, 255, 163, 0.2)',
+    borderRadius: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '16px',
+    flexShrink: 0,
+    boxShadow: '0 0 15px rgba(0, 255, 163, 0.1)',
+  }}>
+    {children}
+  </div>
+);
 
-export default function BentoGrid() {
-  const containerRef = useRef(null);
+const FeatureCard = ({ icon, title, desc, fullWidth }) => {
+  const divRef = useRef(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
 
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      gsap.fromTo('.bento-card', 
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: 'power3.out', scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-          }
-        }
-      );
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
+  const handleMouseMove = (e) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
 
   return (
-    <section ref={containerRef} className="py-24 px-6 max-w-7xl mx-auto">
-      <div className="mb-16">
-        <h2 className="text-3xl md:text-5xl font-semibold mb-4">
-          La precisión de un conserje, <br/>
-          <span className="font-drama text-champagne">la velocidad de la máquina.</span>
+    <div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
+      className="card card-hover"
+      style={{
+        padding: '18px',
+        gridColumn: fullWidth ? '1 / -1' : 'span 1',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        cursor: 'default',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      }}
+    >
+      {/* Glow mouse tracking effect */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: position.y,
+          left: position.x,
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(0, 255, 163, 0.1) 0%, transparent 60%)',
+          transform: 'translate(-50%, -50%)',
+          opacity: opacity,
+          transition: 'opacity 0.3s ease',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+      />
+      
+      {/* Content wrapper to stay above the effect */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <IconBox>{icon}</IconBox>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>{title}</h3>
+        <p style={{ fontSize: '14px', color: '#8b949e', lineHeight: '1.6' }}>{desc}</p>
+      </div>
+    </div>
+  );
+};
+
+const ZapIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M13 2L3 14h9l-1 8L21 10h-9l1-8z" stroke="#00ffa3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ShieldIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#00ffa3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <rect x="3" y="4" width="18" height="18" rx="2" stroke="#00ffa3" strokeWidth="2"/>
+    <path d="M3 9h18M8 2v4M16 2v4" stroke="#00ffa3" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.07 2.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91A16 16 0 0016.09 17.9l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#00ffa3" strokeWidth="2"/>
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke="#00ffa3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export default function BentoGrid() {
+  return (
+    <section id="sistema" style={{ padding: 'clamp(40px, 8vw, 80px) 24px', maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '56px', textAlign: 'center' }}>
+        <div style={{
+          display: 'inline-block',
+          padding: '6px 16px',
+          borderRadius: '50px',
+          border: '1px solid rgba(0, 255, 163, 0.2)',
+          background: 'rgba(0, 255, 163, 0.05)',
+          color: '#00ffa3',
+          fontSize: '11px',
+          fontWeight: 700,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          marginBottom: '20px'
+        }}>QUÉ HACE EXACTAMENTE</div>
+        
+        <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', marginBottom: '20px' }}>
+          <span style={{ color: '#fff' }}>No es un bot de menús.</span><br />
+          <span style={{ color: '#fff' }}>Es un </span>
+          <span className="neon-text">asistente que convierte conversaciones en reservas.</span>
         </h2>
-        <p className="text-ivory/60 max-w-xl text-lg font-light">
-          Convertimos tu WhatsApp en un motor de reservas que trabaja 24/7 sin desordenar tu operativa.
+        
+        <p style={{ fontSize: '16px', color: '#8b949e', maxWidth: '540px', lineHeight: '1.7', margin: '0 auto' }}>
+          FlowMint actúa como tu mejor recepcionista, disponible a cualquier hora, entrenado solo con la información de tu centro.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[320px]">
-        
-        {/* Card 1: Respuesta Inmediata */}
-        <div className="bento-card md:col-span-2 glass-card p-8 relative overflow-hidden group flex flex-col justify-between">
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-champagne/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 group-hover:bg-champagne/20 transition-colors duration-700"></div>
-          
-          <div className="z-10 w-12 h-12 rounded-xl bg-slate flex items-center justify-center mb-6">
-            <Zap className="text-champagne w-6 h-6" />
-          </div>
-          
-          <div className="z-10 mt-auto">
-            <h3 className="text-2xl font-semibold mb-2">Respuesta Inmediata en WhatsApp</h3>
-            <p className="text-ivory/60 font-light max-w-md">
-              El agente responde al instante usando la información real del gimnasio, evitando que los leads se enfríen por tardanza mientras tú das clase.
-            </p>
-          </div>
+      {/* Feature grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+        gap: '20px',
+      }}>
+        <FeatureCard
+          icon={<ZapIcon />}
+          title="Responde al instante en WhatsApp"
+          desc="Cualquier mensaje entra y recibe respuesta en segundos, a cualquier hora del día, sin hacer esperar al interesado."
+        />
+        <FeatureCard
+          icon={<ShieldIcon />}
+          title="Resuelve dudas con la info real de tu centro"
+          desc="Precios, horarios, modalidades, ubicación... el sistema solo responde con lo que tú le has dado. Sin inventar nada."
+        />
+        <FeatureCard
+          icon={<CalendarIcon />}
+          title="Guía a reservar una clase de prueba"
+          desc="Cuando detecta intención, propone disponibilidad y lleva al interesado a comprometerse con una fecha concreta."
+        />
+        <FeatureCard
+          icon={<PhoneIcon />}
+          title="Hace seguimiento automático"
+          desc="Si alguien no confirmó, el sistema puede enviar un recordatorio. Sin que tengas que perseguir a nadie manualmente."
+        />
+        <FeatureCard
+          icon={<UserIcon />}
+          title="Avisa al equipo cuando hace falta una persona real"
+          desc="Si la consulta está fuera del guión, el interesado tiene un problema delicado o pide hablar con alguien, el sistema para y te avisa para que tú tomes el relevo. Sin que el cliente apenas lo note."
+          fullWidth
+        />
+      </div>
 
-          <div className="absolute right-8 top-8 bottom-8 w-1/3 glass-card bg-obsidian/80 border-slate p-4 hidden md:flex flex-col gap-3 font-data text-xs">
-            <div className="flex justify-between text-ivory/40"><span>LEAD</span><span>TIEMPO RESPUESTA</span></div>
-            <div className="flex justify-between items-center bg-slate/50 p-2 rounded"><span className="text-ivory">Juan_M</span><span className="text-champagne">1.2s</span></div>
-            <div className="flex justify-between items-center bg-slate/50 p-2 rounded"><span className="text-ivory">Sofia_T</span><span className="text-champagne">0.8s</span></div>
-            <div className="flex justify-between items-center bg-slate/50 p-2 rounded"><span className="text-ivory">Carlos_R</span><span className="text-champagne">1.4s</span></div>
-            <div className="mt-auto h-1 w-full bg-slate rounded overflow-hidden"><div className="h-full bg-champagne w-full animate-pulse"></div></div>
-          </div>
-        </div>
-
-        {/* Card 2: Más clases */}
-        <div className="bento-card glass-card p-8 relative overflow-hidden group flex flex-col justify-between">
-          <div className="z-10 w-12 h-12 rounded-xl bg-slate flex items-center justify-center mb-6">
-            <CalendarCheck className="text-champagne w-6 h-6" />
-          </div>
-          
-          <div className="z-10 mt-auto">
-            <h3 className="text-xl font-semibold mb-2">Más clases, menos carga</h3>
-            <p className="text-ivory/60 text-sm font-light">
-              Guía a los interesados a reservar una prueba autónomamente, reduciendo el tiempo del equipo.
-            </p>
-          </div>
-
-          <div className="absolute right-[-20%] top-1/4 grid grid-cols-2 gap-2 opacity-30 group-hover:opacity-60 transition-opacity duration-500">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className={`w-16 h-16 rounded-md border border-white/10 ${i % 3 === 0 ? 'bg-champagne/20 border-champagne/30' : 'bg-slate'}`}></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card 3: Control Humano */}
-        <div className="bento-card md:col-span-3 glass-card p-8 flex flex-col md:flex-row items-center justify-between gap-8 group">
-          <div className="max-w-xl z-10 w-full">
-            <div className="w-12 h-12 rounded-xl bg-slate flex items-center justify-center mb-6">
-              <ShieldCheck className="text-champagne w-6 h-6" />
-            </div>
-            <h3 className="text-2xl font-semibold mb-2">Control humano y personalización real</h3>
-            <p className="text-ivory/60 font-light">
-              El sistema se adapta al gimnasio. No inventa respuestas fuera de la base de conocimiento y avisa automáticamente por notificación cuando hace falta intervención humana real.
-            </p>
-          </div>
-
-          <div className="flex-1 w-full flex items-center justify-end z-10">
-            <div className="glass-card bg-obsidian/90 p-5 font-data text-sm w-full max-w-sm border-champagne/20">
-              <div className="text-champagne mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                ALERTA DE HAND-OFF
-              </div>
-              <div className="text-ivory/80 mb-2">El usuario pregunta por una lesión específica.</div>
-              <div className="text-ivory/50 mb-4">&gt; Pausando IA para este chat...</div>
-              <button className="w-full bg-slate hover:bg-slate/80 text-ivory py-2 rounded text-center transition-colors">
-                Tomar el control
-              </button>
-            </div>
-          </div>
-        </div>
-
+      <div style={{ textAlign: 'center', marginTop: '48px' }}>
+        <button
+          onClick={() => {
+            if (window.Calendly) {
+              window.Calendly.initPopupWidget({ url: 'https://calendly.com/mateo-flowmintautomations/consultoria-gratuita' });
+            }
+          }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#8b949e',
+            fontSize: '15px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'color 0.2s',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          onMouseOver={e => e.currentTarget.style.color = '#fff'}
+          onMouseOut={e => e.currentTarget.style.color = '#8b949e'}
+        >
+          Implementar esto en mi gimnasio <span style={{ color: '#00ffa3' }}>→</span>
+        </button>
       </div>
     </section>
   );
