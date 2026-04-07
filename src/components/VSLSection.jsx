@@ -15,7 +15,12 @@ export default function VSLSection() {
   const handlePlayClick = () => {
     setIsPlaying(true);
     if (videoRef.current) {
-      videoRef.current.play();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Auto-play prevented by browser, showing native controls:", error);
+        });
+      }
     }
   };
 
@@ -99,7 +104,7 @@ export default function VSLSection() {
             
             {/* Si no se está reproduciendo, mostrar la miniatura (VSL cover) */}
             {!isPlaying && (
-              <>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img 
                   src="/VSL_cover.png" 
                   alt="Video Cover" 
@@ -111,28 +116,25 @@ export default function VSLSection() {
                     height: '100%',
                     objectFit: 'contain', 
                     objectPosition: 'center',
-                    zIndex: 10
+                    zIndex: 1
                   }}
                   onError={(e) => {
-                    // Fallback visual just in case image is missing
                     e.target.style.display = 'none';
                   }}
                 />
                 
-                {/* Fallback Overlay (in case image is empty/fails, text still shows) */}
+                {/* Fallback Overlay */}
                 <div style={{
                   position: 'absolute',
                   top: 0, left: 0, width: '100%', height: '100%',
                   background: 'linear-gradient(135deg, rgba(22, 27, 34, 0.8) 0%, rgba(13, 17, 23, 0.9) 100%)',
-                  zIndex: 0
+                  zIndex: 2
                 }}></div>
                 
+                {/* Play Button */}
                 <div style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 2,
+                  position: 'relative',
+                  zIndex: 3,
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
@@ -144,14 +146,14 @@ export default function VSLSection() {
                   transition: 'transform 0.2s ease',
                   cursor: 'pointer'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="#0d1117" style={{ marginLeft: '4px' }}>
                     <path d="M5 3l14 9-14 9V3z"/>
                   </svg>
                 </div>
-              </>
+              </div>
             )}
 
             {/* Video Player */}
@@ -160,6 +162,7 @@ export default function VSLSection() {
               src="/VSL.mp4" 
               controls={isPlaying}
               playsInline
+              preload="metadata"
               style={{
                 width: '100%',
                 height: '100%',
